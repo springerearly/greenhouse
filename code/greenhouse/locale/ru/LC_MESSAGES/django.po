@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-10 18:58+0700\n"
+"POT-Creation-Date: 2023-12-10 19:03+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,26 +37,30 @@ msgid "About Device"
 msgstr "Информация о устройстве"
 
 #: .\main\templates\main\about_device.html:20
+msgid "GPIO.VERSION"
+msgstr "Версия GPIO"
+
+#: .\main\templates\main\about_device.html:24
 msgid "P1_REVISION"
 msgstr "Ревизия P1"
 
-#: .\main\templates\main\about_device.html:24
+#: .\main\templates\main\about_device.html:28
 msgid "REVISION"
 msgstr "Ревизия"
 
-#: .\main\templates\main\about_device.html:28
+#: .\main\templates\main\about_device.html:32
 msgid "TYPE"
 msgstr "Тип"
 
-#: .\main\templates\main\about_device.html:32
+#: .\main\templates\main\about_device.html:36
 msgid "MANUFACTURER"
 msgstr "Производитель"
 
-#: .\main\templates\main\about_device.html:36
+#: .\main\templates\main\about_device.html:40
 msgid "PROCESSOR"
 msgstr "Процессор"
 
-#: .\main\templates\main\about_device.html:40
+#: .\main\templates\main\about_device.html:44
 msgid "RAM"
 msgstr "Оперативная память"
 
