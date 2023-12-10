@@ -1,5 +1,6 @@
 import shutil
 import os
+import RPi.GPIO as GPIO
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -24,26 +25,18 @@ def homepage(request):
 
 def statespage(request):
     if request.method == 'GET':
-        items = Item.objects.exclude(owner__username=request.user.username).filter(is_for_sale=True)
         context = {
-            'items': items,
             'items_page': True,
-
         }
         return render(request=request, template_name='main/states.html', context=context)
-    if request.method == 'POST':
-        purchased_item_id = request.POST.get('purchased-item-id')
-        if purchased_item_id:
-            purchased_item_object = Item.objects.get(pk=purchased_item_id)
-            purchased_item_object.owner = request.user
-            purchased_item_object.is_for_sale = False
-            purchased_item_object.save()
-            messages.success(request=request,
-                             message=f'Congratulations! You just bought \
-                             {purchased_item_object} for \
-                             {purchased_item_object.price}')
-        return redirect('states')
-    
+
+def about_device_page(request):
+    if request.method == 'GET':
+        context = {
+            'items_page': True,
+            'rpi_info': GPIO.RPI_INFO,
+        }
+        return render(request=request, template_name='main/about_device.html', context=context)
 
 def loginpage(request):
     if request.method == 'GET':

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% block title_block %}
+    {% translate "Interactive Greenhouse" %} - {% translate "States" %}
+{% endblock %}
+{% block pageheader %}
+    <h1>{% translate "States" %}</h1>    
+{% endblock %}
+{% block content %}
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">1</th>
+      <th scope="col">2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">P1_REVISION</th>
+      <td>{{ rpi_info.P1_REVISION }}</td>
+    </tr>
+    <tr>
+      <th scope="row">REVISION</th>
+      <td>{{ rpi_info.REVISION }}</td>
+    </tr>
+    <tr>
+      <th scope="row">TYPE</th>
+      <td>{{ rpi_info.TYPE }}</td>
+    </tr>
+    <tr>
+      <th scope="row">MANUFACTURER</th>
+      <td>{{ rpi_info.MANUFACTURER }}</td>
+    </tr>
+    <tr>
+      <th scope="row">PROCESSOR</th>
+      <td>{{ rpi_info.PROCESSOR }}</td>
+    </tr>
+    <tr>
+      <th scope="row">RAM</th>
+      <td>{{ rpi_info.RAM }}</td>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}
