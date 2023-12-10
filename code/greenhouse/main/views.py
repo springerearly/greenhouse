@@ -48,7 +48,7 @@ def loginpage(request):
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request=request, user=user)
-            return redirect('items')
+            return redirect('states')
 
         return redirect('login')
 
