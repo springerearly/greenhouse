@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-10 18:52+0700\n"
+"POT-Creation-Date: 2023-12-10 18:58+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,6 +35,30 @@ msgstr "Состояния"
 #: .\templates\includes\navbar.html:13
 msgid "About Device"
 msgstr "Информация о устройстве"
+
+#: .\main\templates\main\about_device.html:20
+msgid "P1_REVISION"
+msgstr "Ревизия P1"
+
+#: .\main\templates\main\about_device.html:24
+msgid "REVISION"
+msgstr "Ревизия"
+
+#: .\main\templates\main\about_device.html:28
+msgid "TYPE"
+msgstr "Тип"
+
+#: .\main\templates\main\about_device.html:32
+msgid "MANUFACTURER"
+msgstr "Производитель"
+
+#: .\main\templates\main\about_device.html:36
+msgid "PROCESSOR"
+msgstr "Процессор"
+
+#: .\main\templates\main\about_device.html:40
+msgid "RAM"
+msgstr "Оперативная память"
 
 #: .\main\templates\main\home.html:4
 msgid "Market - Home page"
