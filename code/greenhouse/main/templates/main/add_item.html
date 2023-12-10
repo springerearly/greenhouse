@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title_block %}
+    {% translate "Market" %} - {% translate "__add_item__" %}
+{% endblock %}
+{% block pageheader %}
+    {% if items_page %}
+        <h1>{% translate "__add_item__" %}</h1>
+    {% else %}
+        <h1>{% translate "__add_item__" %}</h1>
+    {% endif %}
+{% endblock %}
+{% block content %}
+<form action="{% url 'add-item' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="name" class="form-label">{% translate "Name" %}</label>
+      <input name="name" type="text" class="form-control" id="name">
+    </div>
+    <div class="mb-3">
+      <label for="price" class="form-label">{% translate "Price" %}</label>
+      <input name="price" type="number" class="form-control" id="price">
+    </div>
+    <div class="mb-3">
+        <label for="description" class="form-label">{% translate "Description" %}</label>
+        <textarea name="description" class="form-control" id="description" rows="5"></textarea>
+    </div>
+    <div class="mb-3">
+        <input type="text" name="filename" placeholder='{% translate "filename" %}'>
+        <input type="file" name="file">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">{% translate "__add_item__" %}</button>
+  </form>
+{% endblock %}

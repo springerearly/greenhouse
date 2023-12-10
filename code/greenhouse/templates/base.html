@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+        {% block title_block %}
+            Bootstrap demo
+        {% endblock %}
+    </title>
+    {% load static %}
+    {% block css_block %}
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    {% endblock %}
+</head>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<body>
+{% include 'includes/navbar.html' %}
+{% block pageheader %}
+{% endblock %}
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
+<script src="{% static 'js/jquery-3.7.1.slim.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>

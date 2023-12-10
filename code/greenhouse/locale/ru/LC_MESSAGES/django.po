@@ -1,0 +1,227 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-12-03 22:59+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: .\main\templates\main\add_item.html:4 .\main\templates\main\home.html:9
+#: .\main\templates\main\items.html:5 .\templates\includes\navbar.html:4
+msgid "Market"
+msgstr "Интернет-магазин"
+
+#: .\main\templates\main\add_item.html:4 .\main\templates\main\add_item.html:8
+#: .\main\templates\main\add_item.html:10
+#: .\main\templates\main\add_item.html:33 .\templates\includes\navbar.html:13
+msgid "__add_item__"
+msgstr "Добавить товар"
+
+#: .\main\templates\main\add_item.html:17 .\main\templates\main\items.html:19
+msgid "Name"
+msgstr "Наименование"
+
+#: .\main\templates\main\add_item.html:21 .\main\templates\main\items.html:21
+msgid "Price"
+msgstr "Цена"
+
+#: .\main\templates\main\add_item.html:25
+#: .\templates\includes\items_modals.html:76
+msgid "Description"
+msgstr "Описание"
+
+#: .\main\templates\main\add_item.html:29
+msgid "filename"
+msgstr "Имя файла"
+
+#: .\main\templates\main\home.html:4
+msgid "Market - Home page"
+msgstr "Интернет-магазин - Главная страница"
+
+#: .\main\templates\main\home.html:10
+msgid "Start purchasing products by clicking the link below"
+msgstr "Начните приобретать продукцию, перейдя по ссылке ниже"
+
+#: .\main\templates\main\home.html:11
+msgid "Get Started"
+msgstr "Начать"
+
+#: .\main\templates\main\items.html:5 .\main\templates\main\items.html:9
+#: .\templates\includes\navbar.html:11
+msgid "States"
+msgstr "Состояния"
+
+#: .\main\templates\main\items.html:11 .\templates\includes\navbar.html:14
+msgid "My Items"
+msgstr "Мои товары"
+
+#: .\main\templates\main\items.html:20
+msgid "Image"
+msgstr "Изображение"
+
+#: .\main\templates\main\items.html:23
+msgid "Seller"
+msgstr "Продавец"
+
+#: .\main\templates\main\items.html:25
+msgid "Options"
+msgstr "Действия"
+
+#: .\main\templates\main\items.html:27
+msgid "Status"
+msgstr "Статус"
+
+#: .\main\templates\main\items.html:51
+msgid "More Info"
+msgstr "Информация"
+
+#: .\main\templates\main\items.html:56
+msgid "Confirm purchase"
+msgstr "Подтвердить покупку"
+
+#: .\main\templates\main\items.html:61
+msgid "Put up for sale"
+msgstr "Выставить на продажу"
+
+#: .\main\templates\main\items.html:65
+msgid "DeleteItem"
+msgstr "Удалить товар"
+
+#: .\main\templates\main\items.html:71
+msgid "_for_sale"
+msgstr "Продается"
+
+#: .\main\templates\main\items.html:71
+msgid "_not_for_sale"
+msgstr "Не продается"
+
+#: .\main\templates\main\login.html:5 .\main\templates\main\register.html:42
+#: .\templates\includes\navbar.html:18
+msgid "Login"
+msgstr "Войти"
+
+#: .\main\templates\main\login.html:14
+msgid "Please sign in"
+msgstr "Пожалуйста, авторизуйтесь"
+
+#: .\main\templates\main\login.html:18 .\main\templates\main\login.html:20
+#: .\main\templates\main\register.html:20
+#: .\main\templates\main\register.html:22
+#, fuzzy
+#| msgid "Name"
+msgid "username"
+msgstr "Имя пользователя"
+
+#: .\main\templates\main\login.html:23 .\main\templates\main\login.html:25
+#: .\main\templates\main\register.html:27
+#: .\main\templates\main\register.html:29
+msgid "Password"
+msgstr "Пароль"
+
+#: .\main\templates\main\login.html:28
+msgid "Dont Have an account?"
+msgstr "Еще нет аккаунта?"
+
+#: .\main\templates\main\login.html:29 .\main\templates\main\register.html:4
+#: .\templates\includes\navbar.html:19
+msgid "register"
+msgstr "Регистрация"
+
+#: .\main\templates\main\login.html:31
+msgid "Sign in"
+msgstr "Авторизоваться"
+
+#: .\main\templates\main\register.html:15
+msgid "Please Create your Account"
+msgstr "Пожалуйста, создайте новый аккаунт"
+
+#: .\main\templates\main\register.html:34
+#: .\main\templates\main\register.html:36
+msgid "Password Confirmation"
+msgstr "Подтверждение пароля"
+
+#: .\main\templates\main\register.html:41
+msgid "_already_have_an_account_"
+msgstr "Уже есть аккаунт?"
+
+#: .\main\templates\main\register.html:44
+msgid "_cr_acc_"
+msgstr "Создать аккаунт"
+
+#: .\templates\includes\items_modals.html:9
+#: .\templates\includes\items_modals.html:15
+#: .\templates\includes\items_modals.html:27
+#: .\templates\includes\items_modals.html:45
+#: .\templates\includes\items_modals.html:57
+#: .\templates\includes\items_modals.html:83
+#: .\templates\includes\items_modals.html:95
+#: .\templates\includes\items_modals.html:109
+msgid "Close"
+msgstr "Закрыть"
+
+#: .\templates\includes\items_modals.html:26
+msgid "Are you sure you want to buy"
+msgstr "Вы уверены, что хотите купить"
+
+#: .\templates\includes\items_modals.html:37
+msgid "By clicking Purchase, you will buy this item from the market"
+msgstr "Нажав «Купить», вы купите этот товар в магазине"
+
+#: .\templates\includes\items_modals.html:41
+msgid "Purchase"
+msgstr "Купить"
+
+#: .\templates\includes\items_modals.html:56
+msgid "Are you sure you want to sale"
+msgstr "Вы уверены, что хотите продать"
+
+#: .\templates\includes\items_modals.html:63
+msgid "costs"
+msgstr "стоит"
+
+#: .\templates\includes\items_modals.html:63
+msgid "currency"
+msgstr "₽"
+
+#: .\templates\includes\items_modals.html:67
+msgid "By clicking Confirm, you will put this item up for sale in the market"
+msgstr "Нажав «Подтвердить», вы выставите этот товар на продажу в магазине"
+
+#: .\templates\includes\items_modals.html:79
+#: .\templates\includes\items_modals.html:105
+msgid "_confirm_"
+msgstr "Подтвердить"
+
+#: .\templates\includes\items_modals.html:94
+msgid "__are_you_sure_you_want_to_delete__"
+msgstr "Вы уверены, что хотите удалить товар"
+
+#: .\templates\includes\items_modals.html:102
+msgid "__by_clicking_delete__"
+msgstr "Нажав кнопу \"Подтвердить\", вы удалите товар из магазина"
+
+#: .\templates\includes\navbar.html:10
+msgid "Home"
+msgstr "На главную"
+
+#: .\templates\includes\navbar.html:15
+msgid "Hello"
+msgstr "Привет"
+
+#: .\templates\includes\navbar.html:16
+msgid "Logout"
+msgstr "Выйти"
