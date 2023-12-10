@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% block title_block %}
+    {% translate "Interactive Greenhouse" %} - {% translate "States" %}
+{% endblock %}
+{% block pageheader %}
+    <h1>{% translate "About Device" %}</h1>    
+{% endblock %}
+{% block content %}
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">{% translate "GPIO.VERSION" %}</th>
+      <td>{{ gpio_version }}</td>
+    </tr>
+    <tr>
+      <th scope="row">{% translate "P1_REVISION" %}</th>
+      <td>{{ rpi_info.P1_REVISION }}</td>
+    </tr>
+    <tr>
+      <th scope="row">{% translate "REVISION" %}</th>
+      <td>{{ rpi_info.REVISION }}</td>
+    </tr>
+    <tr>
+      <th scope="row">{% translate "TYPE" %}</th>
+      <td>{{ rpi_info.TYPE }}</td>
+    </tr>
+    <tr>
+      <th scope="row">{% translate "MANUFACTURER" %}</th>
+      <td>{{ rpi_info.MANUFACTURER }}</td>
+    </tr>
+    <tr>
+      <th scope="row">{% translate "PROCESSOR" %}</th>
+      <td>{{ rpi_info.PROCESSOR }}</td>
+    </tr>
+    <tr>
+      <th scope="row">{% translate "RAM" %}</th>
+      <td>{{ rpi_info.RAM }}</td>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}

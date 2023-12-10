@@ -39,6 +39,15 @@ def about_device_page(request):
         }
         return render(request=request, template_name='main/about_device.html', context=context)
 
+def settingspage(request):
+    if request.method == 'GET':
+        context = {
+            'items_page': True,
+            'rpi_info': GPIO.RPI_INFO,
+            'gpio_version': str(GPIO.VERSION), 
+        }
+        return render(request=request, template_name='main/settings.html', context=context)
+
 def loginpage(request):
     if request.method == 'GET':
         return render(request=request, template_name='main/login.html')
