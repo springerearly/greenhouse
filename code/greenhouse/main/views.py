@@ -22,7 +22,7 @@ def homepage(request):
     return render(request=request, template_name='main/home.html')
 
 
-def itemspage(request):
+def statespage(request):
     if request.method == 'GET':
         items = Item.objects.exclude(owner__username=request.user.username).filter(is_for_sale=True)
         context = {
@@ -30,7 +30,7 @@ def itemspage(request):
             'items_page': True,
 
         }
-        return render(request=request, template_name='main/items.html', context=context)
+        return render(request=request, template_name='main/states.html', context=context)
     if request.method == 'POST':
         purchased_item_id = request.POST.get('purchased-item-id')
         if purchased_item_id:
@@ -42,61 +42,8 @@ def itemspage(request):
                              message=f'Congratulations! You just bought \
                              {purchased_item_object} for \
                              {purchased_item_object.price}')
-        return redirect('items')
+        return redirect('states')
     
-def delete_itempage(request):
-    if request.method == 'POST':
-        id = request.POST.get('item-for-delete-id')
-        deleteing_item = Item.objects.get(id=id)
-        filename = deleteing_item.image_url
-        if storage.exists(os.path.basename(filename)):
-            print(filename)
-            os.remove(BASE_DIR / "static" / filename)
-        deleteing_item.delete()
-
-        return redirect('my-items')
-    
-    
-
-def my_itemspage(request):
-    if request.method == 'GET':
-        items = Item.objects.filter(owner__username=request.user.username)
-        context = {
-            'items': items,
-            'items_page': False,
-        }
-        return render(request=request, template_name='main/items.html', context=context)
-    if request.method == 'POST':
-        item_for_sale_id = request.POST.get('item-for-sale-id')
-        new_price = request.POST.get('new-price')
-        new_description = request.POST.get('new-description')
-        if item_for_sale_id and new_price and new_description:
-            item_for_sale_object = Item.objects.get(pk=item_for_sale_id)
-            item_for_sale_object.price = new_price
-            item_for_sale_object.description = new_description
-            item_for_sale_object.is_for_sale = True
-            item_for_sale_object.save()
-            messages.success(request=request,
-                             message=f'Congratulations! \
-                             You just bought {item_for_sale_object.name} \
-                             for {item_for_sale_object.price}')
-        return redirect('my-items')
-    
-
-def add_itempage(request):
-    if request.method == 'GET':
-        return render(request=request, template_name='main/add_item.html')
-    if request.method == 'POST':
-        file = request.FILES['file']
-        filename = storage.save(file.name, file)
-        name = request.POST.get('name')
-        price = request.POST.get('price')
-        description = request.POST.get('description')
-        owner = request.user
-        new_item = Item(name=name, price=price, description=description, owner=owner, image_url = f"pics/{filename}", is_for_sale=False)
-        new_item.save()
-        return redirect('items')
-
 
 def loginpage(request):
     if request.method == 'GET':

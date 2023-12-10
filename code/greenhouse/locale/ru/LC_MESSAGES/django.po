@@ -22,8 +22,8 @@ msgstr ""
 
 #: .\main\templates\main\add_item.html:4 .\main\templates\main\home.html:9
 #: .\main\templates\main\items.html:5 .\templates\includes\navbar.html:4
-msgid "Market"
-msgstr "Интернет-магазин"
+msgid "Interactive Greenhouse"
+msgstr "Интерактивная теплица"
 
 #: .\main\templates\main\add_item.html:4 .\main\templates\main\add_item.html:8
 #: .\main\templates\main\add_item.html:10
