@@ -35,6 +35,7 @@ def about_device_page(request):
         context = {
             'items_page': True,
             'rpi_info': GPIO.RPI_INFO,
+            'gpio_version': str(GPIO.VERSION), 
         }
         return render(request=request, template_name='main/about_device.html', context=context)
 
