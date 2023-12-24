@@ -73,8 +73,8 @@ msgid "RAM"
 msgstr "Оперативная память"
 
 #: .\main\templates\main\home.html:4
-msgid "Market - Home page"
-msgstr "Интернет-магазин - Главная страница"
+msgid "Interactive Greenhouse - Home page"
+msgstr "Интерактивная теплица - Главная страница"
 
 #: .\main\templates\main\home.html:10
 msgid "Start purchasing products by clicking the link below"
