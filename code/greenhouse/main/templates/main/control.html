@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% block title_block %}
+    {% translate "Interactive Greenhouse" %} - {% translate "__control__" %}
+{% endblock %}
+{% block pageheader %}
+    <h1>{% translate "__control__" %}</h1>    
+{% endblock %}
+{% block content %}
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">GPIO</th>
+      <th scope="col">Mode</th>
+      <th scope="col">Description</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for gpio_port in gpio_ports %}
+        <tr>
+            <td>GPIO {{gpio_port.gpio_number}}</td>
+            <td>{% if gpio_port.gpio_function == '1' %}
+                    OUTPUT
+                {% elif  gpio_port.gpio_function == '0'%}
+                    INPUT
+                {% else %}
+                   {{gpio_port.gpio_function}} 
+            {% endif %}</td>
+            <td>{{gpio_port.gpio_description}}</td>
+            <td>
+                {% if gpio_port.gpio_function == '1' %}
+                    <form method="POST" action="{% url 'ports-control-set-output' %}">
+                    <input type="hidden" name="gpio_number" value="{{ gpio_port.gpio_number }}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="btn btn-secondary active">
+                        <input type="radio" name="gpio_port{{gpio_port.gpio_number}}" id="option1" autocomplete="off" onchange="this.form.submit();" value="1" {% if gpio_port.level == '1' %}checked{% endif%}> On
+                        </label>
+                        <label class="btn btn-secondary">
+                        <input type="radio" name="gpio_port{{gpio_port.gpio_number}}" id="option2" autocomplete="off" onchange="this.form.submit();" value="0" {% if gpio_port.level == '0' %}checked{% endif%}> Off
+                        </label>
+                    </div>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    
+  </tbody>
+</table>
+{% endblock %}

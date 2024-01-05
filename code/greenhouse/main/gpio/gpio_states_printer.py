@@ -1,10 +1,3 @@
-#! /usr/bin/env python3
-# 2021-04-02
-# 2021-04-13    Fix Wrong model for Old Style revision codes
-# 2021-12-20    Improve Old Style revision codes; ignore unwanted status bits
-# 2022-03-25    Zero 2 W
-# 2022-04-07    typo
-# 2022-09-20    generic raspi-gpio or alternative
 """
 Read all GPIO
 This version for raspi-gpio debug tool or equivalent (user supplied)
@@ -160,7 +153,7 @@ def get_hardware_revision():
                 REV = REV.strip()   # Revision as string
                 return int(REV, base=16)
 
-def main():
+def print_states():
     global TYPE, rev
     rev = get_hardware_revision()
 
@@ -172,6 +165,3 @@ def main():
         TYPE = MM[rev] # Map Old Style revision to TYPE
 
     print_gpio(pin_state)
-
-if __name__ == '__main__':
-	main()

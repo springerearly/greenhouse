@@ -1,0 +1,45 @@
+<!-- Modal -->
+{% load i18n %}
+<div class="modal fade" id="Modal-AssignConfirm{{ item.gpio_number }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">{% translate "_are_you_sure_you_want_to_assign_" %} {{ item.name }} ?</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Close' %}"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'ports-settings-assign' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="gpio-number" value="{{ item.gpio_number }}" class="form-control form-control-lg">
+                    <div class="form-group">
+                        <label for="gpio-description">{% translate '__description__' %}</label>
+                        <input type="text" id="gpio-description" name="gpio-description" rows="3">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="mode">
+                            <option value="1">OUTPUT</option>
+                            <option value="0">INPUT</option>
+                            <option value="alt0">{{ item.alternate_functions.alt0 }}</option>
+                        </select>
+                    </div>
+                    <br>
+                    <h6 class="text-center">
+                        {% translate "_by_clicking_" %}
+                    </h6>
+                    <br>
+                    <input type="hidden" name="gpio-number" value="{{ item.gpio_number }}">
+                    <button type="submit" class="btn btn-primary">{% translate "_assign_" %}</button>
+                </form> 
+                <form method="POST" action="delete/">
+                        {% csrf_token %}
+                        <input type="hidden" name="gpio-number" value="{{ item.gpio_number }}">
+                        <button type="submit" class="btn btn-danger">{% translate "_disassign_" %}</button>
+                    </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>

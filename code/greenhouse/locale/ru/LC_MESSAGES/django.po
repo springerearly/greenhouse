@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-10 19:41+0700\n"
+"POT-Creation-Date: 2024-01-05 08:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,138 +20,178 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: .\main\templates\main\about_device.html:5 .\main\templates\main\home.html:9
-#: .\main\templates\main\settings.html:5 .\main\templates\main\states.html:5
-#: .\templates\includes\navbar.html:4
+#: main/templates/main/about_device.html:5 main/templates/main/home.html:9
+#: main/templates/main/ports_settings.html:5
+#: main/templates/main/settings.html:5 main/templates/main/states.html:5
+#: templates/includes/navbar.html:4
 msgid "Interactive Greenhouse"
 msgstr "Интерактивная теплица"
 
-#: .\main\templates\main\about_device.html:5
-#: .\main\templates\main\settings.html:5 .\main\templates\main\states.html:5
-#: .\main\templates\main\states.html:8 .\templates\includes\navbar.html:13
+#: main/templates/main/about_device.html:5 main/templates/main/settings.html:5
+#: main/templates/main/states.html:5 main/templates/main/states.html:8
 msgid "States"
 msgstr "Состояния"
 
-#: .\main\templates\main\about_device.html:8
-#: .\main\templates\main\settings.html:8 .\templates\includes\navbar.html:11
+#: main/templates/main/about_device.html:8 main/templates/main/settings.html:8
+#: templates/includes/navbar.html:11
 msgid "About Device"
 msgstr "Информация о устройстве"
 
-#: .\main\templates\main\about_device.html:20
-#: .\main\templates\main\settings.html:20
+#: main/templates/main/about_device.html:20
+#: main/templates/main/settings.html:20
 msgid "GPIO.VERSION"
 msgstr "Версия GPIO"
 
-#: .\main\templates\main\about_device.html:24
-#: .\main\templates\main\settings.html:24
+#: main/templates/main/about_device.html:24
+#: main/templates/main/settings.html:24
 msgid "P1_REVISION"
 msgstr "Ревизия P1"
 
-#: .\main\templates\main\about_device.html:28
-#: .\main\templates\main\settings.html:28
+#: main/templates/main/about_device.html:28
+#: main/templates/main/settings.html:28
 msgid "REVISION"
 msgstr "Ревизия"
 
-#: .\main\templates\main\about_device.html:32
-#: .\main\templates\main\settings.html:32
+#: main/templates/main/about_device.html:32
+#: main/templates/main/settings.html:32
 msgid "TYPE"
 msgstr "Тип"
 
-#: .\main\templates\main\about_device.html:36
-#: .\main\templates\main\settings.html:36
+#: main/templates/main/about_device.html:36
+#: main/templates/main/settings.html:36
 msgid "MANUFACTURER"
 msgstr "Производитель"
 
-#: .\main\templates\main\about_device.html:40
-#: .\main\templates\main\settings.html:40
+#: main/templates/main/about_device.html:40
+#: main/templates/main/settings.html:40
 msgid "PROCESSOR"
 msgstr "Процессор"
 
-#: .\main\templates\main\about_device.html:44
-#: .\main\templates\main\settings.html:44
+#: main/templates/main/about_device.html:44
+#: main/templates/main/settings.html:44
 msgid "RAM"
 msgstr "Оперативная память"
 
-#: .\main\templates\main\home.html:4
+#: main/templates/main/home.html:4
 msgid "Interactive Greenhouse - Home page"
 msgstr "Интерактивная теплица - Главная страница"
 
-#: .\main\templates\main\home.html:10
-msgid "Start purchasing products by clicking the link below"
-msgstr "Начните приобретать продукцию, перейдя по ссылке ниже"
-
-#: .\main\templates\main\home.html:11
+#: main/templates/main/home.html:11
 msgid "Get Started"
 msgstr "Начать"
 
-#: .\main\templates\main\login.html:5 .\main\templates\main\register.html:42
-#: .\templates\includes\navbar.html:18
+#: main/templates/main/login.html:5 main/templates/main/register.html:42
+#: templates/includes/navbar.html:18
 msgid "Login"
 msgstr "Войти"
 
-#: .\main\templates\main\login.html:14
+#: main/templates/main/login.html:14
 msgid "Please sign in"
 msgstr "Пожалуйста, авторизуйтесь"
 
-#: .\main\templates\main\login.html:18 .\main\templates\main\login.html:20
-#: .\main\templates\main\register.html:20
-#: .\main\templates\main\register.html:22
+#: main/templates/main/login.html:18 main/templates/main/login.html:20
+#: main/templates/main/register.html:20 main/templates/main/register.html:22
 #, fuzzy
 #| msgid "Name"
 msgid "username"
 msgstr "Имя пользователя"
 
-#: .\main\templates\main\login.html:23 .\main\templates\main\login.html:25
-#: .\main\templates\main\register.html:27
-#: .\main\templates\main\register.html:29
+#: main/templates/main/login.html:23 main/templates/main/login.html:25
+#: main/templates/main/register.html:27 main/templates/main/register.html:29
 msgid "Password"
 msgstr "Пароль"
 
-#: .\main\templates\main\login.html:28
+#: main/templates/main/login.html:28
 msgid "Dont Have an account?"
 msgstr "Еще нет аккаунта?"
 
-#: .\main\templates\main\login.html:29 .\main\templates\main\register.html:4
-#: .\templates\includes\navbar.html:19
+#: main/templates/main/login.html:29 main/templates/main/register.html:4
+#: templates/includes/navbar.html:19
 msgid "register"
 msgstr "Регистрация"
 
-#: .\main\templates\main\login.html:31
+#: main/templates/main/login.html:31
 msgid "Sign in"
 msgstr "Авторизоваться"
 
-#: .\main\templates\main\register.html:15
+#: main/templates/main/ports_settings.html:5
+#: main/templates/main/ports_settings.html:8 templates/includes/navbar.html:14
+msgid "_ports_settings_"
+msgstr "Настройки портов GPIO"
+
+#: main/templates/main/ports_settings.html:14
+msgid "_port_name_"
+msgstr "Имя порта"
+
+#: main/templates/main/ports_settings.html:15
+msgid "_status_"
+msgstr "Состояние"
+
+#: main/templates/main/ports_settings.html:25
+#: templates/includes/gpio_modals.html:32
+msgid "_assign_"
+msgstr "Назначить"
+
+#: main/templates/main/register.html:15
 msgid "Please Create your Account"
 msgstr "Пожалуйста, создайте новый аккаунт"
 
-#: .\main\templates\main\register.html:34
-#: .\main\templates\main\register.html:36
+#: main/templates/main/register.html:34 main/templates/main/register.html:36
 msgid "Password Confirmation"
 msgstr "Подтверждение пароля"
 
-#: .\main\templates\main\register.html:41
+#: main/templates/main/register.html:41
 msgid "_already_have_an_account_"
 msgstr "Уже есть аккаунт?"
 
-#: .\main\templates\main\register.html:44
+#: main/templates/main/register.html:44
 msgid "_cr_acc_"
 msgstr "Создать аккаунт"
 
-#: .\templates\includes\navbar.html:10
+#: templates/includes/gpio_modals.html:8
+msgid "_are_you_sure_you_want_to_assign_"
+msgstr "Вы уверены, что хотите назначить порт"
+
+#: templates/includes/gpio_modals.html:9 templates/includes/gpio_modals.html:41
+msgid "Close"
+msgstr "Закрыть"
+
+#: templates/includes/gpio_modals.html:16
+msgid "__description__"
+msgstr "Описание"
+
+#: templates/includes/gpio_modals.html:28
+msgid "_by_clicking_"
+msgstr "Нажав на кнопку \"Подтвердить\" вы сделаете назначение на порт"
+
+#: templates/includes/gpio_modals.html:37
+msgid "_disassign_"
+msgstr "Отменить назначение"
+
+#: templates/includes/navbar.html:10
 msgid "Home"
 msgstr "На главную"
 
-#: .\templates\includes\navbar.html:14
-msgid "Settings"
-msgstr "Настройки устройства"
+#: templates/includes/navbar.html:13
+msgid "__control__"
+msgstr " Управление"
 
-#: .\templates\includes\navbar.html:15
+#: templates/includes/navbar.html:15
 msgid "Hello"
 msgstr "Привет"
 
-#: .\templates\includes\navbar.html:16
+#: templates/includes/navbar.html:16
 msgid "Logout"
 msgstr "Выйти"
+
+#~ msgid "Settings"
+#~ msgstr "Настройки устройства"
+
+#~ msgid "__assigned__"
+#~ msgstr "Назначено"
+
+#~ msgid "__not_assigned__"
+#~ msgstr "Не назначено"
 
 #~ msgid "__add_item__"
 #~ msgstr "Добавить товар"
@@ -161,9 +201,6 @@ msgstr "Выйти"
 
 #~ msgid "Price"
 #~ msgstr "Цена"
-
-#~ msgid "Description"
-#~ msgstr "Описание"
 
 #~ msgid "filename"
 #~ msgstr "Имя файла"
@@ -179,9 +216,6 @@ msgstr "Выйти"
 
 #~ msgid "Options"
 #~ msgstr "Действия"
-
-#~ msgid "Status"
-#~ msgstr "Статус"
 
 #~ msgid "More Info"
 #~ msgstr "Информация"
@@ -201,9 +235,6 @@ msgstr "Выйти"
 #~ msgid "_not_for_sale"
 #~ msgstr "Не продается"
 
-#~ msgid "Close"
-#~ msgstr "Закрыть"
-
 #~ msgid "Are you sure you want to buy"
 #~ msgstr "Вы уверены, что хотите купить"
 
@@ -212,9 +243,6 @@ msgstr "Выйти"
 
 #~ msgid "Purchase"
 #~ msgstr "Купить"
-
-#~ msgid "Are you sure you want to sale"
-#~ msgstr "Вы уверены, что хотите продать"
 
 #~ msgid "costs"
 #~ msgstr "стоит"
@@ -225,12 +253,3 @@ msgstr "Выйти"
 #~ msgid ""
 #~ "By clicking Confirm, you will put this item up for sale in the market"
 #~ msgstr "Нажав «Подтвердить», вы выставите этот товар на продажу в магазине"
-
-#~ msgid "_confirm_"
-#~ msgstr "Подтвердить"
-
-#~ msgid "__are_you_sure_you_want_to_delete__"
-#~ msgstr "Вы уверены, что хотите удалить товар"
-
-#~ msgid "__by_clicking_delete__"
-#~ msgstr "Нажав кнопу \"Подтвердить\", вы удалите товар из магазина"

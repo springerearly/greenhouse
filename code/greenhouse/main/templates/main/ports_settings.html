@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% block title_block %}
+    {% translate "Interactive Greenhouse" %} - {% translate "_ports_settings_" %}
+{% endblock %}
+{% block pageheader %}
+    <h1>{% translate "_ports_settings_" %}</h1>    
+{% endblock %}
+{% block content %}
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">{% translate "_port_name_" %}</th>
+      <th scope="col">{% translate "_status_" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in gpio_ports %}
+    <tr>
+        <td class="mx-auto">
+            <div class="d-grid gap-2 d-md-block">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#Modal-AssignConfirm{{ item.gpio_number }}">
+                                {% translate "_assign_" %} {{ item.name }}
+                </button>
+            </div>
+            {% include 'includes/gpio_modals.html' %}
+        </td>
+        <td class="mx-auto">
+            {{ item.func }}
+        </td>
+    </tr>
+    {% endfor %}
+    
+  </tbody>
+</table>
+{% endblock %}
