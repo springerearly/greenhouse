@@ -81,6 +81,7 @@ def ports_settings_page(request):
             'items_page': True,
             'gpio_ports': gpio_ports_from_device,
         }
+        print(gpio_ports_from_device)
         return render(request=request, template_name='main/ports_settings.html', context=context)
     
 def ports_settings_assign(request):
