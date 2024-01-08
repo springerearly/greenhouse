@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-07 07:34+0000\n"
+"POT-Creation-Date: 2024-01-08 07:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,6 +75,22 @@ msgstr "Оперативная память"
 msgid "__control__"
 msgstr " Управление"
 
+#: main/templates/main/control.html:14
+msgid "__GPIO__"
+msgstr "Имя порта ввода/вывода"
+
+#: main/templates/main/control.html:15
+msgid "__mode__"
+msgstr "Режим работы"
+
+#: main/templates/main/control.html:16 templates/includes/gpio_modals.html:16
+msgid "__description__"
+msgstr "Описание"
+
+#: main/templates/main/control.html:17
+msgid "__action__"
+msgstr "Действие"
+
 #: main/templates/main/home.html:4
 msgid "Interactive Greenhouse - Home page"
 msgstr "Интерактивная теплица - Главная страница"
@@ -130,16 +146,20 @@ msgstr "Имя порта"
 msgid "_status_"
 msgstr "Состояние"
 
-#: main/templates/main/ports_settings.html:25
+#: main/templates/main/ports_settings.html:26
 #: templates/includes/gpio_modals.html:32
 msgid "_assign_"
 msgstr "Назначить"
 
-#: main/templates/main/ports_settings.html:31
+#: main/templates/main/ports_settings.html:33
+msgid "_disassign_"
+msgstr "Отменить назначение"
+
+#: main/templates/main/ports_settings.html:40
 msgid "__assigned__"
 msgstr "Назначено"
 
-#: main/templates/main/ports_settings.html:31
+#: main/templates/main/ports_settings.html:40
 msgid "__not_assigned__"
 msgstr "Не назначено"
 
@@ -163,21 +183,13 @@ msgstr "Создать аккаунт"
 msgid "_are_you_sure_you_want_to_assign_"
 msgstr "Вы уверены, что хотите назначить порт"
 
-#: templates/includes/gpio_modals.html:9 templates/includes/gpio_modals.html:41
+#: templates/includes/gpio_modals.html:9 templates/includes/gpio_modals.html:36
 msgid "Close"
 msgstr "Закрыть"
-
-#: templates/includes/gpio_modals.html:16
-msgid "__description__"
-msgstr "Описание"
 
 #: templates/includes/gpio_modals.html:28
 msgid "_by_clicking_"
 msgstr "Нажав на кнопку \"Подтвердить\" вы сделаете назначение на порт"
-
-#: templates/includes/gpio_modals.html:37
-msgid "_disassign_"
-msgstr "Отменить назначение"
 
 #: templates/includes/navbar.html:10
 msgid "Home"
@@ -220,37 +232,3 @@ msgstr "Выйти"
 
 #~ msgid "More Info"
 #~ msgstr "Информация"
-
-#~ msgid "Confirm purchase"
-#~ msgstr "Подтвердить покупку"
-
-#~ msgid "Put up for sale"
-#~ msgstr "Выставить на продажу"
-
-#~ msgid "DeleteItem"
-#~ msgstr "Удалить товар"
-
-#~ msgid "_for_sale"
-#~ msgstr "Продается"
-
-#~ msgid "_not_for_sale"
-#~ msgstr "Не продается"
-
-#~ msgid "Are you sure you want to buy"
-#~ msgstr "Вы уверены, что хотите купить"
-
-#~ msgid "By clicking Purchase, you will buy this item from the market"
-#~ msgstr "Нажав «Купить», вы купите этот товар в магазине"
-
-#~ msgid "Purchase"
-#~ msgstr "Купить"
-
-#~ msgid "costs"
-#~ msgstr "стоит"
-
-#~ msgid "currency"
-#~ msgstr "₽"
-
-#~ msgid ""
-#~ "By clicking Confirm, you will put this item up for sale in the market"
-#~ msgstr "Нажав «Подтвердить», вы выставите этот товар на продажу в магазине"
