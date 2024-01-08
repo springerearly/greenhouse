@@ -17,7 +17,8 @@ from .gpio import (
     set_gpio_value, 
     print_states,
     get_cpu_info, 
-    get_gpio_banks
+    get_gpio_banks,
+    run_shell,
     )
 
 
@@ -81,7 +82,6 @@ def ports_settings_page(request):
             'items_page': True,
             'gpio_ports': gpio_ports_from_device,
         }
-        print(gpio_ports_from_device)
         return render(request=request, template_name='main/ports_settings.html', context=context)
     
 def ports_settings_assign(request):
@@ -100,7 +100,6 @@ def ports_settings_assign(request):
             obj = Gpio(gpio_number=gpio_number, gpio_function=mode, gpio_description=gpio_description)
             # Сохраняем объект в базе данных
             obj.save()
-        print('GPIO number:', gpio_number, 'Mode:', mode)
         set_gpio_state(gpio_number=gpio_number, state=mode)
         return redirect('ports-settings')
 
@@ -111,9 +110,15 @@ def ports_control_set_output(request):
     return redirect('control')
 
 
-def ports_settings_delete(request):
+def ports_settings_disassign(request):
     if request.method == 'POST':
-        pass
+        gpio_number = int(request.POST['gpio_number'])
+        run_shell(f"raspi-gpio set {gpio_number} op pn dl")
+        run_shell(f"raspi-gpio set {gpio_number} ip pn")
+        obj = get_object_or_404(Gpio, pk=gpio_number)
+        obj.delete()
+        return redirect('ports-settings')
+
 
 
 def loginpage(request):

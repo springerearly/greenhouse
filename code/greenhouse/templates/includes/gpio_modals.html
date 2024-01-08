@@ -30,12 +30,7 @@
                     <br>
                     <input type="hidden" name="gpio-number" value="{{ item.gpio_number }}">
                     <button type="submit" class="btn btn-primary">{% translate "_assign_" %}</button>
-                </form> 
-                <form method="POST" action="delete/">
-                        {% csrf_token %}
-                        <input type="hidden" name="gpio-number" value="{{ item.gpio_number }}">
-                        <button type="submit" class="btn btn-danger">{% translate "_disassign_" %}</button>
-                    </form>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate "Close" %}</button>

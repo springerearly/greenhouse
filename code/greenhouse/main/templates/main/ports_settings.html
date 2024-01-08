@@ -19,16 +19,26 @@
     {% for item in gpio_ports %}
     <tr>
         <td class="mx-auto">
+            {% if item.assigned == False %}
             <div class="d-grid gap-2 d-md-block">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#Modal-AssignConfirm{{ item.gpio_number }}">
                                 {% translate "_assign_" %} {{ item.name }}
                 </button>
             </div>
+            {% else %}
+            <form method="POST" action="{% url 'ports-settings-disassign' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="gpio_number" value="{{ item.gpio_number }}">
+                        <button type="submit" class="btn btn-danger">{% translate "_disassign_" %} {{ item.name }}</button>
+                    </form>
+            {% endif%}
+
             {% include 'includes/gpio_modals.html' %}
         </td>
         <td class="mx-auto">
-            {{ item.func }}
+            {{ item.func }} - {% if item.assigned == True %} {% translate "__assigned__"%}{% else %}{% translate "__not_assigned__"%}{% endif %}
+
         </td>
     </tr>
     {% endfor %}

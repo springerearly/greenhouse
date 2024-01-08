@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-05 08:05+0000\n"
+"POT-Creation-Date: 2024-01-07 07:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,15 +20,13 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: main/templates/main/about_device.html:5 main/templates/main/home.html:9
-#: main/templates/main/ports_settings.html:5
-#: main/templates/main/settings.html:5 main/templates/main/states.html:5
-#: templates/includes/navbar.html:4
+#: main/templates/main/about_device.html:5 main/templates/main/control.html:5
+#: main/templates/main/home.html:9 main/templates/main/ports_settings.html:5
+#: main/templates/main/settings.html:5 templates/includes/navbar.html:4
 msgid "Interactive Greenhouse"
 msgstr "Интерактивная теплица"
 
 #: main/templates/main/about_device.html:5 main/templates/main/settings.html:5
-#: main/templates/main/states.html:5 main/templates/main/states.html:8
 msgid "States"
 msgstr "Состояния"
 
@@ -72,11 +70,16 @@ msgstr "Процессор"
 msgid "RAM"
 msgstr "Оперативная память"
 
+#: main/templates/main/control.html:5 main/templates/main/control.html:8
+#: templates/includes/navbar.html:13
+msgid "__control__"
+msgstr " Управление"
+
 #: main/templates/main/home.html:4
 msgid "Interactive Greenhouse - Home page"
 msgstr "Интерактивная теплица - Главная страница"
 
-#: main/templates/main/home.html:11
+#: main/templates/main/home.html:11 main/templates/main/home.html:13
 msgid "Get Started"
 msgstr "Начать"
 
@@ -132,6 +135,14 @@ msgstr "Состояние"
 msgid "_assign_"
 msgstr "Назначить"
 
+#: main/templates/main/ports_settings.html:31
+msgid "__assigned__"
+msgstr "Назначено"
+
+#: main/templates/main/ports_settings.html:31
+msgid "__not_assigned__"
+msgstr "Не назначено"
+
 #: main/templates/main/register.html:15
 msgid "Please Create your Account"
 msgstr "Пожалуйста, создайте новый аккаунт"
@@ -172,10 +183,6 @@ msgstr "Отменить назначение"
 msgid "Home"
 msgstr "На главную"
 
-#: templates/includes/navbar.html:13
-msgid "__control__"
-msgstr " Управление"
-
 #: templates/includes/navbar.html:15
 msgid "Hello"
 msgstr "Привет"
@@ -186,12 +193,6 @@ msgstr "Выйти"
 
 #~ msgid "Settings"
 #~ msgstr "Настройки устройства"
-
-#~ msgid "__assigned__"
-#~ msgstr "Назначено"
-
-#~ msgid "__not_assigned__"
-#~ msgstr "Не назначено"
 
 #~ msgid "__add_item__"
 #~ msgstr "Добавить товар"
