@@ -15,10 +15,14 @@ RUN npm run build
 # Stage 2: Serve the app with Nginx
 FROM nginx:stable-alpine
 
-COPY --from=build /app/build /usr/share/nginx/html
+# Remove default nginx config
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Copy nginx config if needed, but the default should work for now
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy new nginx config
+COPY nginx.conf /etc/nginx/conf.d
+
+# Copy build artifacts
+COPY --from=build /app/build /usr/share/nginx/html
 
 EXPOSE 80
 

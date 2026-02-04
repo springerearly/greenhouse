@@ -1,15 +1,9 @@
-const API_URL = 'http://localhost:8000'; // This will be proxied by React dev server in development
-
-// In production, the Nginx container will handle the proxying.
-// We can use a relative URL.
-const getApiUrl = () => {
-    return process.env.NODE_ENV === 'development'
-      ? API_URL
-      : '';
-  };
+// When running in development mode (npm start), the proxy in package.json will handle this.
+// In production (Docker), Nginx will proxy requests starting with /gpio.
+const API_BASE = '/gpio';
 
 export const getGpios = async () => {
-    const response = await fetch(`${getApiUrl()}/gpio/`);
+    const response = await fetch(`${API_BASE}/`);
     if (!response.ok) {
         throw new Error('Failed to fetch GPIOs');
     }
@@ -17,7 +11,7 @@ export const getGpios = async () => {
 };
 
 export const getAllPins = async () => {
-    const response = await fetch(`${getApiUrl()}/gpio/all-pins`);
+    const response = await fetch(`${API_BASE}/all-pins`);
     if (!response.ok) {
         throw new Error('Failed to fetch all pins');
     }
@@ -25,7 +19,7 @@ export const getAllPins = async () => {
 };
 
 export const setGpioValue = async (pinNumber, value) => {
-    const response = await fetch(`${getApiUrl()}/gpio/set-value`, {
+    const response = await fetch(`${API_BASE}/set-value`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gpio_number: pinNumber, value: value }),
@@ -37,7 +31,7 @@ export const setGpioValue = async (pinNumber, value) => {
 };
 
 export const setGpioFunction = async (pinNumber, description, func) => {
-    const response = await fetch(`${getApiUrl()}/gpio/set-function`, {
+    const response = await fetch(`${API_BASE}/set-function`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -54,7 +48,7 @@ export const setGpioFunction = async (pinNumber, description, func) => {
 
 
 export const unassignGpio = async (pinNumber) => {
-    const response = await fetch(`${getApiUrl()}/gpio/${pinNumber}`, {
+    const response = await fetch(`${API_BASE}/${pinNumber}`, {
         method: 'DELETE',
     });
     if (!response.ok) {
