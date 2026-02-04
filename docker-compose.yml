@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: greenhouse_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=greenhousedb
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./api
+    container_name: greenhouse_api
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./api:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      # This needs to match the db service
+      - DATABASE_URL=postgresql://user:password@db/greenhousedb
+
+  client:
+    build: ./client
+    container_name: greenhouse_client
+    ports:
+      - "80:80" # Changed from 3000 to 80 for the Nginx server
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

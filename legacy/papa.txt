@@ -1,0 +1,4 @@
+Backend - FastAPI
+Frontend - React
+ORM - SQLalchemy
+Database - PostgreSQL
