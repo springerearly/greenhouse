@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from . import models
-from .database import engine
-from .routers import gpio
+import models
+from database import engine
+from routers import gpio
 
 models.Base.metadata.create_all(bind=engine)
 
