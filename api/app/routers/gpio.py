@@ -13,8 +13,8 @@ except ImportError:
     ON_PI = False
 
 
-import models, schemas
-from database import get_db, SessionLocal
+from .. import models, schemas
+from ..database import get_db, SessionLocal
 
 # This will hold our device objects
 devices = {}
