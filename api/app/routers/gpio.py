@@ -97,7 +97,7 @@ def set_function(gpio_config: schemas.GpioCreate, db: Session = Depends(get_db))
         db_gpio.gpio_function = function
         db_gpio.gpio_description = gpio_config.gpio_description
     else:
-        db_gpio = models.Gpio(**gpio_config.dict())
+        db_gpio = models.Gpio(**gpio_config.model_dump())
         db.add(db_gpio)
     
     db.commit()
