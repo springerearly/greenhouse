@@ -1,16 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 try:
     # GPIO Zero
     from gpiozero import DigitalOutputDevice, DigitalInputDevice
-    from gpiozero.pins.native import NativeFactory # Using the native pin factory
+    from gpiozero.pins.pi import PiBoardInfo
     from gpiozero.exc import GPIOZeroError
     from gpiozero.devices import pi_info
     ON_PI = True
 except ImportError:
     ON_PI = False
+    # Mock classes for development on non-Pi machines
+    class DigitalOutputDevice:
+        def __init__(self, pin): self.pin = pin; self.value = 0
+        def on(self): self.value = 1
+        def off(self): self.value = 0
+        def close(self): pass
+    class DigitalInputDevice:
+        def __init__(self, pin): self.pin = pin; self.value = 0
+        def close(self): pass
 
 
 from .. import models, schemas
@@ -29,11 +38,32 @@ def get_device(pin_number):
         return devices[pin_number]
     return None
 
-@router.get("/", response_model=List[schemas.Gpio])
-def get_all_gpios(db: Session = Depends(get_db)):
+@router.get("/", response_model=List[schemas.GpioWithState])
+def get_all_gpios_with_state(db: Session = Depends(get_db)):
     gpios = db.query(models.Gpio).all()
-    # Here we could also add the current live state from gpiozero if needed
-    return gpios
+    gpios_with_state = []
+    for gpio in gpios:
+        gpio_data = {
+            "gpio_number": gpio.gpio_number,
+            "gpio_description": gpio.gpio_description,
+            "gpio_function": gpio.gpio_function,
+            "value": None
+        }
+        device = get_device(gpio.gpio_number)
+        if device and hasattr(device, 'value'):
+            gpio_data['value'] = device.value
+        gpios_with_state.append(gpio_data)
+    return gpios_with_state
+
+@router.get("/all-pins")
+def get_all_pins_info():
+    if not ON_PI:
+        # For development, return mock data
+        return [{"number": i, "header": "J8"} for i in range(1, 28)]
+    info = PiBoardInfo()
+    # This gives a lot of info, I'll simplify it for the frontend
+    return [{"number": pin.number, "header": pin.header} for pin in info.pins.values()]
+
 
 @router.post("/set-function")
 def set_function(gpio_config: schemas.GpioCreate, db: Session = Depends(get_db)):
@@ -82,7 +112,19 @@ def set_value(gpio_value: schemas.GpioSetValue):
     Set the value of an OUTPUT pin.
     """
     if not ON_PI:
-        raise HTTPException(status_code=500, detail="Not running on a Raspberry Pi.")
+        # Mock behavior for development
+        pin_number = gpio_value.gpio_number
+        device = get_device(pin_number)
+        if not device:
+            devices[pin_number] = DigitalOutputDevice(pin_number)
+            device = devices[pin_number]
+        
+        if gpio_value.value == 1:
+            device.on()
+        else:
+            device.off()
+        print(f"Mock-setting GPIO {pin_number} to {gpio_value.value}")
+        return {"message": f"Value for GPIO {pin_number} set to {gpio_value.value}"}
         
     pin_number = gpio_value.gpio_number
     value = gpio_value.value
@@ -106,13 +148,32 @@ def set_value(gpio_value: schemas.GpioSetValue):
 
     return {"message": f"Value for GPIO {pin_number} set to {value}"}
 
+@router.delete("/{pin_number}")
+def unassign_gpio(pin_number: int, db: Session = Depends(get_db)):
+    if pin_number in devices:
+        devices[pin_number].close()
+        del devices[pin_number]
+
+    db_gpio = db.query(models.Gpio).filter(models.Gpio.gpio_number == pin_number).first()
+    if not db_gpio:
+        raise HTTPException(status_code=404, detail="GPIO not found in database.")
+    
+    db.delete(db_gpio)
+    db.commit()
+    
+    return {"message": f"GPIO {pin_number} unassigned."}
+
 @router.get("/info")
 def get_device_info():
     """
     Get information about the Raspberry Pi.
     """
     if not ON_PI:
-        return {"message": "Not running on a Raspberry Pi."}
+        return {
+            "revision": "MOCK", "model": "MOCK_PI", "pcb_revision": "MOCK",
+            "ram": "MOCK_RAM", "manufacturer": "MOCK_MAKER",
+            "processor": "MOCK_PROC", "headers": {"J8": {}},
+        }
         
     try:
         info = pi_info()

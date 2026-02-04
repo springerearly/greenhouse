@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HomePage from './pages/HomePage';
 import ControlPage from './pages/ControlPage';
+import PortsSettingsPage from './pages/PortsSettingsPage';
 // import other pages as they are created
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/control" element={<ControlPage />} />
+          <Route path="/settings" element={<PortsSettingsPage />} />
           {/* Add other routes here */}
         </Routes>
       </div>

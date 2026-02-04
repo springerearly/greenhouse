@@ -13,6 +13,9 @@ class Gpio(GpioBase):
     class Config:
         from_attributes = True
 
+class GpioWithState(Gpio):
+    value: Optional[int] = None
+
 # For GPIO control
 class GpioSetState(BaseModel):
     gpio_number: int

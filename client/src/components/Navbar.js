@@ -17,7 +17,9 @@ function Navbar() {
             <li className="nav-item">
               <Link className="nav-link" to="/control">Control</Link>
             </li>
-            {/* Add more nav items here */}
+            <li className="nav-item">
+              <Link className="nav-link" to="/settings">Ports Settings</Link>
+            </li>
           </ul>
         </div>
       </div>
