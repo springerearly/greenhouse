@@ -83,17 +83,6 @@ export default function RaspberryInfoPage() {
                 <div className="alert alert-danger">❌ Ошибка загрузки: {error}</div>
             )}
 
-            {/* Диагностическое предупреждение если pi_info упала, но мы на Pi */}
-            {!loading && info?.pi_info_error && (
-                <div className="alert alert-warning d-flex gap-2 align-items-start mb-3">
-                    <span>⚠️</span>
-                    <div>
-                        <strong>gpiozero не смог определить модель платы</strong> — данные прочитаны из{' '}
-                        <code>/proc/cpuinfo</code> напрямую.<br />
-                        <span className="text-muted small">Причина: {info.pi_info_error}</span>
-                    </div>
-                </div>
-            )}
 
             <div className="row g-4">
 

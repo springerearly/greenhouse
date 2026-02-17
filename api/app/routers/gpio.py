@@ -523,41 +523,46 @@ def get_pi_info():
             "on_pi": False,
         }
 
-    # Пробуем получить информацию через gpiozero pi_info()
+    # /proc/cpuinfo — всегда читаем как источник правды
+    cpuinfo  = _read_cpuinfo()
+    revision = cpuinfo.get("Revision", "unknown")
+
+    # Базовые данные из cpuinfo (надёжны на любой версии gpiozero)
+    base = {
+        "revision":     revision,
+        "model":        cpuinfo.get("Model", "Raspberry Pi (unknown model)"),
+        "pcb_revision": revision,
+        "ram":          _ram_from_revision(revision),
+        "manufacturer": _manufacturer_from_revision(revision),
+        "processor":    _processor_from_revision(revision),
+        "hw_pwm_pins":  sorted(HW_PWM_PINS),
+        "on_pi":        True,
+    }
+
+    # Пробуем обогатить данными из gpiozero pi_info() (необязательно)
     if pi_info is not None:
         try:
             info = pi_info()
-            return {
-                "revision":     info.revision,
-                "model":        info.model,
-                "pcb_revision": info.pcb_revision,
-                "ram":          f"{info.memory}M",
-                "manufacturer": info.manufacturer,
-                "processor":    info.processor,
-                "headers":      info.headers,
-                "hw_pwm_pins":  sorted(HW_PWM_PINS),
-                "on_pi":        True,
-            }
-        except Exception as e:
-            pi_info_err = str(e)
-    else:
-        pi_info_err = "pi_info недоступен (gpiozero 2.x или модуль не найден)"
+            # Обновляем только те поля, которые реально есть в объекте
+            if hasattr(info, "revision"):
+                base["revision"] = info.revision
+            if hasattr(info, "model"):
+                base["model"] = info.model
+            if hasattr(info, "pcb_revision"):
+                base["pcb_revision"] = info.pcb_revision
+            if hasattr(info, "memory") and info.memory:
+                base["ram"] = f"{info.memory} МБ"
+            if hasattr(info, "manufacturer") and info.manufacturer:
+                base["manufacturer"] = info.manufacturer
+            # processor: в gpiozero 1.x — info.processor, в 2.x может не быть
+            for attr in ("processor", "soc", "cpu"):
+                if hasattr(info, attr) and getattr(info, attr):
+                    base["processor"] = getattr(info, attr)
+                    break
+        except Exception:
+            pass  # gpiozero не смогла — не страшно, cpuinfo уже заполнил всё
 
-    # pi_info() не смогла определить плату — читаем из /proc/cpuinfo напрямую
-    cpuinfo = _read_cpuinfo()
-    revision = cpuinfo.get("Revision", "unknown")
-    return {
-        "revision":      revision,
-        "model":         cpuinfo.get("Model", "Raspberry Pi (unknown model)"),
-        "pcb_revision":  revision,
-        "ram":           _ram_from_revision(revision),
-        "manufacturer":  _manufacturer_from_revision(revision),
-        "processor":     cpuinfo.get("Hardware", "unknown"),
-        "headers":       {},
-        "hw_pwm_pins":   sorted(HW_PWM_PINS),
-        "on_pi":         True,
-        "pi_info_error": pi_info_err,
-    }
+    return base
 
 
 def _read_cpuinfo() -> dict:
@@ -606,6 +611,28 @@ def _manufacturer_from_revision(revision: str) -> str:
             mfr_map  = {0: "Sony UK", 1: "Egoman", 2: "Embest",
                         3: "Sony Japan", 4: "Embest", 5: "Stadium"}
             return mfr_map.get(mfr_code, "unknown")
+    except Exception:
+        pass
+    return "unknown"
+
+
+def _processor_from_revision(revision: str) -> str:
+    """
+    Декодирует тип процессора из revision-кода (биты [15:12]).
+    0=BCM2835, 1=BCM2836, 2=BCM2837, 3=BCM2711, 4=BCM2712.
+    """
+    try:
+        rev_int = int(revision.lstrip("0") or "0", 16)
+        if rev_int & (1 << 23):
+            proc_code = (rev_int >> 12) & 0xF
+            proc_map  = {
+                0: "BCM2835",
+                1: "BCM2836",
+                2: "BCM2837",
+                3: "BCM2711",  # Pi 4
+                4: "BCM2712",  # Pi 5
+            }
+            return proc_map.get(proc_code, f"unknown (code {proc_code})")
     except Exception:
         pass
     return "unknown"
