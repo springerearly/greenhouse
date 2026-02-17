@@ -11,7 +11,6 @@ const FIELD_LABELS = {
     manufacturer: { label: 'Производитель',  icon: '🏭' },
 };
 
-// Системная информация через /proc (запрашивается отдельно через API)
 function InfoRow({ icon, label, value, mono = false }) {
     return (
         <tr>
@@ -25,18 +24,16 @@ function InfoRow({ icon, label, value, mono = false }) {
     );
 }
 
-function StatusBadge({ value }) {
-    if (value === 'MOCK') {
-        return <span className="badge bg-secondary">Mock (не Pi)</span>;
-    }
-    return <span className="badge bg-success">Raspberry Pi</span>;
+function StatusBadge({ onPi }) {
+    if (!onPi) return <span className="badge bg-secondary">Mock (не Pi)</span>;
+    return <span className="badge bg-success">✅ Raspberry Pi</span>;
 }
 
 export default function RaspberryInfoPage() {
-    const [info, setInfo]       = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError]     = useState(null);
-    const [sysInfo, setSysInfo] = useState(null);
+    const [info, setInfo]             = useState(null);
+    const [loading, setLoading]       = useState(true);
+    const [error, setError]           = useState(null);
+    const [sysInfo, setSysInfo]       = useState(null);
     const [sysLoading, setSysLoading] = useState(true);
 
     const fetchInfo = useCallback(async () => {
@@ -52,7 +49,6 @@ export default function RaspberryInfoPage() {
         }
     }, []);
 
-    // Дополнительная системная информация через /gpio/sysinfo
     const fetchSysInfo = useCallback(async () => {
         setSysLoading(true);
         try {
@@ -67,7 +63,8 @@ export default function RaspberryInfoPage() {
         fetchSysInfo();
     }, [fetchInfo, fetchSysInfo]);
 
-    const isMock = info?.revision === 'MOCK';
+    // Используем явное поле on_pi, а revision === 'MOCK' как запасной вариант
+    const isMock = info ? (info.on_pi === false || info.revision === 'MOCK') : false;
 
     return (
         <div>
@@ -83,8 +80,18 @@ export default function RaspberryInfoPage() {
             </div>
 
             {error && (
-                <div className="alert alert-danger">
-                    ❌ Ошибка загрузки: {error}
+                <div className="alert alert-danger">❌ Ошибка загрузки: {error}</div>
+            )}
+
+            {/* Диагностическое предупреждение если pi_info упала, но мы на Pi */}
+            {!loading && info?.pi_info_error && (
+                <div className="alert alert-warning d-flex gap-2 align-items-start mb-3">
+                    <span>⚠️</span>
+                    <div>
+                        <strong>gpiozero не смог определить модель платы</strong> — данные прочитаны из{' '}
+                        <code>/proc/cpuinfo</code> напрямую.<br />
+                        <span className="text-muted small">Причина: {info.pi_info_error}</span>
+                    </div>
                 </div>
             )}
 
@@ -108,7 +115,7 @@ export default function RaspberryInfoPage() {
                                             <td className="text-muted" style={{ width: '40%' }}>
                                                 <span className="me-1">📟</span>Тип устройства
                                             </td>
-                                            <td><StatusBadge value={info?.revision} /></td>
+                                            <td><StatusBadge onPi={!isMock} /></td>
                                         </tr>
                                         {Object.entries(FIELD_LABELS).map(([key, meta]) => (
                                             <InfoRow
@@ -148,7 +155,7 @@ export default function RaspberryInfoPage() {
                                                 : null}
                                         />
                                         <InfoRow icon="⚡" label="Напряжение CPU"
-                                            value={sysInfo.cpu_voltage != null ? `${sysInfo.cpu_voltage} В` : null}
+                                            value={sysInfo.cpu_voltage != null ? sysInfo.cpu_voltage : null}
                                         />
                                         <InfoRow icon="🕐" label="Uptime"
                                             value={sysInfo.uptime}

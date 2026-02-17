@@ -23,15 +23,33 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 # ─── gpiozero import с mock-заглушками ────────────────────────────────────────
+def _detect_pi() -> bool:
+    """
+    Проверяем наличие Raspberry Pi по /proc/cpuinfo.
+    Это надёжнее чем полагаться на успех импорта gpiozero,
+    который может упасть с разными исключениями (не только ImportError).
+    """
+    try:
+        with open("/proc/cpuinfo") as f:
+            content = f.read()
+        return "Raspberry Pi" in content or "BCM2" in content or "Hardware" in content
+    except Exception:
+        return False
+
 try:
     from gpiozero import DigitalOutputDevice, DigitalInputDevice, PWMOutputDevice
     from gpiozero.pins.pi import PiBoardInfo
     from gpiozero.exc import GPIOZeroError
     from gpiozero.devices import pi_info
-    ON_PI = True
-except ImportError:
+    # Даже если импорт прошёл — проверяем реальное железо
+    ON_PI = _detect_pi()
+    if not ON_PI:
+        print("[GPIO] gpiozero импортирован, но /proc/cpuinfo не содержит признаков Pi — mock-режим.")
+except Exception:
     ON_PI = False
+    print("[GPIO] Не удалось импортировать gpiozero — mock-режим.")
 
+if not ON_PI:
     class _MockBase:
         def __init__(self, pin, **kw):
             self.pin = pin
@@ -440,7 +458,10 @@ def get_pi_info():
             "ram": "MOCK_RAM", "manufacturer": "MOCK_MAKER",
             "processor": "MOCK_PROC", "headers": {"J8": {}},
             "hw_pwm_pins": sorted(HW_PWM_PINS),
+            "on_pi": False,
         }
+
+    # Пробуем получить информацию через gpiozero pi_info()
     try:
         info = pi_info()
         return {
@@ -452,9 +473,38 @@ def get_pi_info():
             "processor":    info.processor,
             "headers":      info.headers,
             "hw_pwm_pins":  sorted(HW_PWM_PINS),
+            "on_pi":        True,
         }
     except Exception as e:
-        return {"error": str(e), "hw_pwm_pins": sorted(HW_PWM_PINS)}
+        # pi_info() не смогла определить плату (например нет /proc/device-tree/model),
+        # но мы точно на Pi — читаем данные из /proc/cpuinfo напрямую
+        cpuinfo = _read_cpuinfo()
+        return {
+            "revision":     cpuinfo.get("Revision", "unknown"),
+            "model":        cpuinfo.get("Model", "Raspberry Pi (unknown model)"),
+            "pcb_revision": cpuinfo.get("Revision", "unknown"),
+            "ram":          "unknown",
+            "manufacturer": "unknown",
+            "processor":    cpuinfo.get("Hardware", "unknown"),
+            "headers":      {},
+            "hw_pwm_pins":  sorted(HW_PWM_PINS),
+            "on_pi":        True,
+            "pi_info_error": str(e),
+        }
+
+
+def _read_cpuinfo() -> dict:
+    """Читает /proc/cpuinfo и возвращает dict ключ→значение."""
+    result = {}
+    try:
+        with open("/proc/cpuinfo") as f:
+            for line in f:
+                if ":" in line:
+                    key, _, val = line.partition(":")
+                    result[key.strip()] = val.strip()
+    except Exception:
+        pass
+    return result
 
 
 @router.get("/sysinfo")
