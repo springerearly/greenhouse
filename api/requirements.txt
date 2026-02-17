@@ -8,3 +8,4 @@ passlib[bcrypt]
 pydantic
 httpx
 websockets
+alembic

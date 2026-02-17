@@ -24,8 +24,8 @@ services:
     build: ./api
     container_name: greenhouse_api
     restart: unless-stopped
-    # --reload для dev, уберите в production
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+    # entrypoint.sh запускает: pg_isready → alembic upgrade head → uvicorn
+    # Переопределение command здесь больше не нужно — всё в entrypoint.sh
     volumes:
       - ./api:/app
     ports:
@@ -35,11 +35,14 @@ services:
         condition: service_healthy
     environment:
       - DATABASE_URL=postgresql://user:password@db/greenhousedb
-    # Доступ к GPIO на реальном Raspberry Pi (раскомментировать на Pi):
-    # devices:
-    #   - /dev/gpiomem
-    # group_add:
-    #   - "gpio"
+      - DB_HOST=db
+      - DB_USER=user
+    # Доступ к GPIO на реальном Raspberry Pi
+    devices:
+      - /dev/gpiomem
+      - /dev/gpiochip0
+    group_add:
+      - "gpio"
 
   # ─── React + Nginx ────────────────────────────────────────────────────────────
   client:

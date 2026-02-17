@@ -259,7 +259,20 @@ async def set_function(gpio_config: schemas.GpioCreate, db: Session = Depends(ge
             else:
                 dev = PWMOutputDevice(pin_number, initial_value=0.0)
     except GPIOZeroError as e:
+        err = str(e)
+        # Даём понятную подсказку при отсутствии доступа к /dev/gpiomem
+        if "gpiomem" in err or "permission" in err.lower() or "No access" in err:
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    f"Нет доступа к GPIO: {e}. "
+                    "Убедитесь, что в docker-compose.yml раскомментированы "
+                    "devices: /dev/gpiomem и /dev/gpiochip0, и group_add: gpio."
+                )
+            )
         raise HTTPException(status_code=500, detail=f"GPIO error: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Неожиданная ошибка GPIO: {e}")
 
     devices[pin_number] = dev
 

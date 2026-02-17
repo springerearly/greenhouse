@@ -1,20 +1,31 @@
-# Use an official Python runtime as a parent image
+# Use Python 3.9 slim as base
 FROM python:3.9-slim
+
+# Install pg_isready (postgresql-client) for the entrypoint health check
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Copy and install Python dependencies (layer cached separately)
 COPY requirements.txt .
-
-# Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code into the container
+# Copy application source
 COPY ./app ./app
 
-# Expose the port the app runs on
-EXPOSE 8000
+# Copy Alembic configuration and migrations
+COPY alembic.ini .
+COPY alembic ./alembic
 
-# Command to run the application using the app package
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Copy entrypoint script and make it executable
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+# Expose API port
+EXPOSE 8001
+
+# Default command — runs migrations then starts uvicorn
+ENTRYPOINT ["./entrypoint.sh"]
