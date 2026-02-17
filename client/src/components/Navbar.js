@@ -65,6 +65,9 @@ function Navbar() {
                 )}
               </Link>
             </li>
+            <li className="nav-item">
+              <Link className={`nav-link ${isActive('/raspberry')}`} to="/raspberry">🍓 Raspberry Pi</Link>
+            </li>
           </ul>
           {/* Индикатор WS */}
           <span

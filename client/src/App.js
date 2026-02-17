@@ -9,6 +9,7 @@ import DeviceDetailPage from './pages/DeviceDetailPage';
 import MonitoringPage from './pages/MonitoringPage';
 import AutomationsPage from './pages/AutomationsPage';
 import AlertsPage from './pages/AlertsPage';
+import RaspberryInfoPage from './pages/RaspberryInfoPage';
 import { wsClient } from './services/websocket';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route path="/monitoring"    element={<MonitoringPage />} />
           <Route path="/automations"   element={<AutomationsPage />} />
           <Route path="/alerts"        element={<AlertsPage />} />
+          <Route path="/raspberry"     element={<RaspberryInfoPage />} />
         </Routes>
       </div>
     </Router>
