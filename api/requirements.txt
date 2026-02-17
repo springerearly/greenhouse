@@ -6,3 +6,5 @@ gpiozero
 python-jose[cryptography]
 passlib[bcrypt]
 pydantic
+httpx
+websockets

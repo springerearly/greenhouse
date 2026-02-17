@@ -1,58 +1,119 @@
-// When running in development mode (npm start), the proxy in package.json will handle this.
-// In production (Docker), Nginx will proxy requests starting with /gpio.
-const API_BASE = '/gpio';
+// В dev-режиме proxy в package.json перенаправляет на localhost:8000
+// В production Nginx проксирует /gpio, /devices, /sensors, /automations, /alerts -> api:8000
 
-export const getGpios = async () => {
-    const response = await fetch(`${API_BASE}/`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch GPIOs');
-    }
-    return await response.json();
-};
+const BASE = '';
 
-export const getAllPins = async () => {
-    const response = await fetch(`${API_BASE}/all-pins`);
-    if (!response.ok) {
-        throw new Error('Failed to fetch all pins');
-    }
-    return await response.json();
-};
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
-export const setGpioValue = async (pinNumber, value) => {
-    const response = await fetch(`${API_BASE}/set-value`, {
-        method: 'POST',
+async function request(url, options = {}) {
+    const res = await fetch(url, {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gpio_number: pinNumber, value: value }),
+        ...options,
     });
-    if (!response.ok) {
-        throw new Error('Failed to set GPIO value');
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || `HTTP ${res.status}`);
     }
-    return await response.json();
-};
+    if (res.status === 204) return null;
+    return res.json();
+}
 
-export const setGpioFunction = async (pinNumber, description, func) => {
-    const response = await fetch(`${API_BASE}/set-function`, {
+// ─── GPIO ────────────────────────────────────────────────────────────────────
+
+export const getGpios = () => request(`${BASE}/gpio/`);
+export const getAllPins = () => request(`${BASE}/gpio/all-pins`);
+export const getGpioInfo = () => request(`${BASE}/gpio/info`);
+
+export const setGpioValue = (pinNumber, value) =>
+    request(`${BASE}/gpio/set-value`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            gpio_number: pinNumber, 
+        body: JSON.stringify({ gpio_number: pinNumber, value }),
+    });
+
+export const setGpioFunction = (pinNumber, description, func) =>
+    request(`${BASE}/gpio/set-function`, {
+        method: 'POST',
+        body: JSON.stringify({
+            gpio_number: pinNumber,
             gpio_description: description,
-            gpio_function: func 
+            gpio_function: func,
         }),
     });
-    if (!response.ok) {
-        throw new Error('Failed to set GPIO function');
-    }
-    return await response.json();
-};
 
+export const unassignGpio = (pinNumber) =>
+    request(`${BASE}/gpio/${pinNumber}`, { method: 'DELETE' });
 
-export const unassignGpio = async (pinNumber) => {
-    const response = await fetch(`${API_BASE}/${pinNumber}`, {
-        method: 'DELETE',
+// value: 0.0 – 1.0 (или 0–100, бэкенд нормализует)
+export const setGpioPwm = (pinNumber, value) =>
+    request(`${BASE}/gpio/set-pwm`, {
+        method: 'POST',
+        body: JSON.stringify({ gpio_number: pinNumber, value }),
     });
-    if (!response.ok) {
-        throw new Error('Failed to unassign GPIO');
-    }
-    return await response.json();
+
+
+// ─── Devices ─────────────────────────────────────────────────────────────────
+
+export const getDevices = () => request(`${BASE}/devices/`);
+export const getDevice = (id) => request(`${BASE}/devices/${id}`);
+
+export const createDevice = (data) =>
+    request(`${BASE}/devices/`, { method: 'POST', body: JSON.stringify(data) });
+
+export const updateDevice = (id, data) =>
+    request(`${BASE}/devices/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+
+export const deleteDevice = (id) =>
+    request(`${BASE}/devices/${id}`, { method: 'DELETE' });
+
+export const pollDeviceNow = (id) =>
+    request(`${BASE}/devices/${id}/poll`, { method: 'POST' });
+
+export const controlDevice = (id, command) =>
+    request(`${BASE}/devices/${id}/control`, {
+        method: 'POST',
+        body: JSON.stringify(command),
+    });
+
+export const getDeviceHwInfo = (id) => request(`${BASE}/devices/${id}/info`);
+
+
+// ─── Sensors ─────────────────────────────────────────────────────────────────
+
+export const getLatestReadings = (deviceId) => {
+    const q = deviceId !== undefined ? `?device_id=${deviceId}` : '';
+    return request(`${BASE}/sensors/latest${q}`);
 };
+
+export const getSensorHistory = (deviceId, sensorType, hours = 24) =>
+    request(`${BASE}/sensors/history?device_id=${deviceId}&sensor_type=${sensorType}&hours=${hours}`);
+
+export const getSensorStats = (deviceId, sensorType, hours = 24) =>
+    request(`${BASE}/sensors/stats?device_id=${deviceId}&sensor_type=${sensorType}&hours=${hours}`);
+
+
+// ─── Automations ─────────────────────────────────────────────────────────────
+
+export const getAutomations = () => request(`${BASE}/automations/`);
+
+export const createAutomation = (data) =>
+    request(`${BASE}/automations/`, { method: 'POST', body: JSON.stringify(data) });
+
+export const updateAutomation = (id, data) =>
+    request(`${BASE}/automations/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+
+export const deleteAutomation = (id) =>
+    request(`${BASE}/automations/${id}`, { method: 'DELETE' });
+
+
+// ─── Alerts ──────────────────────────────────────────────────────────────────
+
+export const getAlerts = (unacknowledgedOnly = false) =>
+    request(`${BASE}/alerts/?unacknowledged_only=${unacknowledgedOnly}`);
+
+export const getAlertCounts = () => request(`${BASE}/alerts/count`);
+
+export const acknowledgeAlert = (id) =>
+    request(`${BASE}/alerts/${id}/acknowledge`, { method: 'POST' });
+
+export const acknowledgeAll = () =>
+    request(`${BASE}/alerts/acknowledge-all`, { method: 'POST' });

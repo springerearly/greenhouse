@@ -1,7 +1,10 @@
 services:
+
+  # ─── PostgreSQL ──────────────────────────────────────────────────────────────
   db:
     image: postgres:13-alpine
     container_name: greenhouse_db
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
@@ -10,26 +13,41 @@ services:
       - POSTGRES_DB=greenhousedb
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d greenhousedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
+  # ─── FastAPI Backend ──────────────────────────────────────────────────────────
   api:
     build: ./api
     container_name: greenhouse_api
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
+    # --reload для dev, уберите в production
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
     volumes:
       - ./api:/app
     ports:
-      - "8000:8000"
+      - "8001:8001"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      # This needs to match the db service
       - DATABASE_URL=postgresql://user:password@db/greenhousedb
+    # Доступ к GPIO на реальном Raspberry Pi (раскомментировать на Pi):
+    # devices:
+    #   - /dev/gpiomem
+    # group_add:
+    #   - "gpio"
 
+  # ─── React + Nginx ────────────────────────────────────────────────────────────
   client:
     build: ./client
     container_name: greenhouse_client
+    restart: unless-stopped
     ports:
-      - "80:80" # Changed from 3000 to 80 for the Nginx server
+      - "8088:80"
     depends_on:
       - api
 
