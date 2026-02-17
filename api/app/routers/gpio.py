@@ -23,33 +23,95 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 # ─── gpiozero import с mock-заглушками ────────────────────────────────────────
+
 def _detect_pi() -> bool:
     """
-    Проверяем наличие Raspberry Pi по /proc/cpuinfo.
-    Это надёжнее чем полагаться на успех импорта gpiozero,
-    который может упасть с разными исключениями (не только ImportError).
+    Надёжное определение Raspberry Pi по /proc/cpuinfo и /proc/device-tree/model.
+    НЕ используем просто "Hardware" — оно есть на любом Linux.
+    Ищем конкретные строки характерные только для Pi.
     """
+    # Способ 1: /proc/device-tree/model (самый надёжный на новых Pi OS)
+    try:
+        with open("/proc/device-tree/model", "rb") as f:
+            model = f.read().decode("utf-8", errors="replace")
+        if "Raspberry Pi" in model:
+            print(f"[GPIO] Обнаружен: {model.strip()}")
+            return True
+    except Exception:
+        pass
+
+    # Способ 2: /proc/cpuinfo — ищем строго "Raspberry Pi" в строке Model
     try:
         with open("/proc/cpuinfo") as f:
-            content = f.read()
-        return "Raspberry Pi" in content or "BCM2" in content or "Hardware" in content
+            for line in f:
+                # "Model\t: Raspberry Pi 4 Model B Rev 1.4"
+                if line.startswith("Model") and "Raspberry Pi" in line:
+                    print(f"[GPIO] Обнаружен по cpuinfo: {line.strip()}")
+                    return True
+                # "Hardware\t: BCM2711" — только BCM271x/BCM283x реально Pi
+                if line.startswith("Hardware") and (
+                    "BCM2711" in line or "BCM2837" in line or
+                    "BCM2836" in line or "BCM2835" in line
+                ):
+                    print(f"[GPIO] Обнаружен по Hardware: {line.strip()}")
+                    return True
     except Exception:
-        return False
+        pass
 
-try:
-    from gpiozero import DigitalOutputDevice, DigitalInputDevice, PWMOutputDevice
-    from gpiozero.pins.pi import PiBoardInfo
-    from gpiozero.exc import GPIOZeroError
-    from gpiozero.devices import pi_info
-    # Даже если импорт прошёл — проверяем реальное железо
-    ON_PI = _detect_pi()
-    if not ON_PI:
-        print("[GPIO] gpiozero импортирован, но /proc/cpuinfo не содержит признаков Pi — mock-режим.")
-except Exception:
-    ON_PI = False
-    print("[GPIO] Не удалось импортировать gpiozero — mock-режим.")
+    return False
+
+
+# Определяем платформу ДО импорта gpiozero
+ON_PI = _detect_pi()
+
+# Импортируем gpiozero только если мы на Pi
+# (на не-Pi gpiozero может упасть при попытке определить pin factory)
+_gpiozero_ok = False
+if ON_PI:
+    try:
+        from gpiozero import DigitalOutputDevice, DigitalInputDevice, PWMOutputDevice
+        from gpiozero.exc import GPIOZeroError
+        _gpiozero_ok = True
+        print("[GPIO] gpiozero успешно импортирован.")
+    except Exception as e:
+        print(f"[GPIO] Ошибка импорта gpiozero: {e} — переходим на mock.")
+        ON_PI = False
+
+# pi_info импортируем отдельно — в gpiozero 2.x путь изменился
+pi_info = None
+if _gpiozero_ok:
+    for _pi_info_path in (
+        "gpiozero.devices",        # gpiozero 1.x
+        "gpiozero",                # gpiozero 2.x
+    ):
+        try:
+            import importlib as _il
+            _m = _il.import_module(_pi_info_path)
+            if hasattr(_m, "pi_info"):
+                pi_info = _m.pi_info
+                break
+        except Exception:
+            pass
+
+# PiBoardInfo — только для /gpio/all-pins, не критично
+PiBoardInfo = None
+if _gpiozero_ok:
+    for _path, _attr in (
+        ("gpiozero.pins.pi", "PiBoardInfo"),
+        ("gpiozero.boards", "PiBoardInfo"),
+    ):
+        try:
+            import importlib as _il
+            _m = _il.import_module(_path)
+            if hasattr(_m, _attr):
+                PiBoardInfo = getattr(_m, _attr)
+                break
+        except Exception:
+            pass
 
 if not ON_PI:
+    print("[GPIO] Режим: MOCK (не Raspberry Pi или gpiozero недоступен)")
+
     class _MockBase:
         def __init__(self, pin, **kw):
             self.pin = pin
@@ -65,7 +127,6 @@ if not ON_PI:
         when_deactivated = None
 
     class PWMOutputDevice(_MockBase):
-        """Mock PWM: value = 0.0…1.0"""
         def __init__(self, pin, initial_value=0.0, **kw):
             super().__init__(pin)
             self.value = initial_value
@@ -215,24 +276,25 @@ def get_all_gpios_with_state(db: Session = Depends(get_db)):
 @router.get("/all-pins")
 def get_all_pins_info():
     """Вернуть все доступные пины платы с флагом аппаратного PWM."""
-    if not ON_PI:
+    # Fallback: стандартная раскладка Pi GPIO 1-27
+    fallback = [
+        {"number": i, "header": "J8", "supports_hw_pwm": i in HW_PWM_PINS}
+        for i in range(1, 28)
+    ]
+    if not ON_PI or PiBoardInfo is None:
+        return fallback
+    try:
+        info = PiBoardInfo()
         return [
             {
-                "number": i,
-                "header": "J8",
-                "supports_hw_pwm": i in HW_PWM_PINS,
+                "number": pin.number,
+                "header": pin.header,
+                "supports_hw_pwm": pin.number in HW_PWM_PINS,
             }
-            for i in range(1, 28)
+            for pin in info.pins.values()
         ]
-    info = PiBoardInfo()
-    return [
-        {
-            "number": pin.number,
-            "header": pin.header,
-            "supports_hw_pwm": pin.number in HW_PWM_PINS,
-        }
-        for pin in info.pins.values()
-    ]
+    except Exception:
+        return fallback
 
 
 @router.post("/set-function")
@@ -462,35 +524,39 @@ def get_pi_info():
         }
 
     # Пробуем получить информацию через gpiozero pi_info()
-    try:
-        info = pi_info()
-        return {
-            "revision":     info.revision,
-            "model":        info.model,
-            "pcb_revision": info.pcb_revision,
-            "ram":          f"{info.memory}M",
-            "manufacturer": info.manufacturer,
-            "processor":    info.processor,
-            "headers":      info.headers,
-            "hw_pwm_pins":  sorted(HW_PWM_PINS),
-            "on_pi":        True,
-        }
-    except Exception as e:
-        # pi_info() не смогла определить плату (например нет /proc/device-tree/model),
-        # но мы точно на Pi — читаем данные из /proc/cpuinfo напрямую
-        cpuinfo = _read_cpuinfo()
-        return {
-            "revision":     cpuinfo.get("Revision", "unknown"),
-            "model":        cpuinfo.get("Model", "Raspberry Pi (unknown model)"),
-            "pcb_revision": cpuinfo.get("Revision", "unknown"),
-            "ram":          "unknown",
-            "manufacturer": "unknown",
-            "processor":    cpuinfo.get("Hardware", "unknown"),
-            "headers":      {},
-            "hw_pwm_pins":  sorted(HW_PWM_PINS),
-            "on_pi":        True,
-            "pi_info_error": str(e),
-        }
+    if pi_info is not None:
+        try:
+            info = pi_info()
+            return {
+                "revision":     info.revision,
+                "model":        info.model,
+                "pcb_revision": info.pcb_revision,
+                "ram":          f"{info.memory}M",
+                "manufacturer": info.manufacturer,
+                "processor":    info.processor,
+                "headers":      info.headers,
+                "hw_pwm_pins":  sorted(HW_PWM_PINS),
+                "on_pi":        True,
+            }
+        except Exception as e:
+            pi_info_err = str(e)
+    else:
+        pi_info_err = "pi_info недоступен (gpiozero 2.x или модуль не найден)"
+
+    # pi_info() не смогла определить плату — читаем из /proc/cpuinfo напрямую
+    cpuinfo = _read_cpuinfo()
+    return {
+        "revision":      cpuinfo.get("Revision", "unknown"),
+        "model":         cpuinfo.get("Model", "Raspberry Pi (unknown model)"),
+        "pcb_revision":  cpuinfo.get("Revision", "unknown"),
+        "ram":           "unknown",
+        "manufacturer":  "unknown",
+        "processor":     cpuinfo.get("Hardware", "unknown"),
+        "headers":       {},
+        "hw_pwm_pins":   sorted(HW_PWM_PINS),
+        "on_pi":         True,
+        "pi_info_error": pi_info_err,
+    }
 
 
 def _read_cpuinfo() -> dict:
