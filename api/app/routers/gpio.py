@@ -457,6 +457,119 @@ def get_pi_info():
         return {"error": str(e), "hw_pwm_pins": sorted(HW_PWM_PINS)}
 
 
+@router.get("/sysinfo")
+def get_sysinfo():
+    """
+    Системная информация: CPU температура, загрузка, RAM, диск, uptime, IP, ядро.
+    Читается через psutil (кроссплатформенно) + /proc/cpuinfo для напряжения (только Pi).
+    """
+    import os
+    import socket
+    import platform
+
+    result: dict = {}
+
+    # ── psutil ────────────────────────────────────────────────────────────────
+    try:
+        import psutil
+
+        # CPU usage (1-секундный замер в синхронном эндпоинте — приемлемо)
+        result["cpu_usage"] = psutil.cpu_percent(interval=0.5)
+
+        # RAM
+        vm = psutil.virtual_memory()
+        result["ram_total"]   = _fmt_bytes(vm.total)
+        result["ram_used"]    = _fmt_bytes(vm.used)
+        result["ram_percent"] = vm.percent
+
+        # Disk
+        du = psutil.disk_usage("/")
+        result["disk_total"]   = _fmt_bytes(du.total)
+        result["disk_used"]    = _fmt_bytes(du.used)
+        result["disk_percent"] = du.percent
+
+        # Uptime
+        import datetime
+        boot_time = datetime.datetime.fromtimestamp(psutil.boot_time())
+        delta     = datetime.datetime.now() - boot_time
+        d, rem    = divmod(int(delta.total_seconds()), 86400)
+        h, rem    = divmod(rem, 3600)
+        m         = rem // 60
+        result["uptime"] = (
+            f"{d}д {h}ч {m}м" if d else f"{h}ч {m}м"
+        )
+
+        # IP адреса (исключаем loopback)
+        ips = []
+        for iface, addrs in psutil.net_if_addrs().items():
+            for addr in addrs:
+                if addr.family == socket.AF_INET and not addr.address.startswith("127."):
+                    ips.append(f"{iface}: {addr.address}")
+        result["ip_addresses"] = ips
+
+    except ImportError:
+        result["psutil_error"] = "psutil не установлен"
+
+    # ── CPU температура (только Linux / Pi) ───────────────────────────────────
+    cpu_temp = None
+    try:
+        # Путь для Raspberry Pi
+        with open("/sys/class/thermal/thermal_zone0/temp") as f:
+            cpu_temp = int(f.read().strip()) / 1000.0
+    except Exception:
+        pass
+
+    if cpu_temp is None:
+        try:
+            import psutil
+            temps = psutil.sensors_temperatures()
+            for key in ("cpu_thermal", "cpu-thermal", "coretemp", "k10temp"):
+                if key in temps and temps[key]:
+                    cpu_temp = temps[key][0].current
+                    break
+        except Exception:
+            pass
+
+    result["cpu_temp"] = cpu_temp
+
+    # ── CPU напряжение (только Pi через vcgencmd) ─────────────────────────────
+    try:
+        import subprocess
+        out = subprocess.check_output(
+            ["vcgencmd", "measure_volts", "core"],
+            timeout=2, stderr=subprocess.DEVNULL
+        ).decode().strip()
+        # out = "volt=1.2000V"
+        result["cpu_voltage"] = out.replace("volt=", "").replace("V", "") + " В"
+    except Exception:
+        result["cpu_voltage"] = None
+
+    # ── ОС / ядро ─────────────────────────────────────────────────────────────
+    result["kernel"]  = platform.release()
+    result["os_name"] = platform.version() if platform.system() != "Linux" else _read_os_name()
+
+    return result
+
+
+def _fmt_bytes(b: int) -> str:
+    """Форматирует байты в читаемый вид (MB / GB)."""
+    if b >= 1_073_741_824:
+        return f"{b / 1_073_741_824:.1f} ГБ"
+    return f"{b / 1_048_576:.0f} МБ"
+
+
+def _read_os_name() -> str:
+    """Читает PRETTY_NAME из /etc/os-release."""
+    try:
+        with open("/etc/os-release") as f:
+            for line in f:
+                if line.startswith("PRETTY_NAME="):
+                    return line.split("=", 1)[1].strip().strip('"')
+    except Exception:
+        pass
+    return "Linux"
+
+
 # ─── Lifecycle ────────────────────────────────────────────────────────────────
 
 def startup_event():
