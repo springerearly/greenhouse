@@ -42,7 +42,7 @@ services:
       - /dev/gpiomem
       - /dev/gpiochip0
     group_add:
-      - "gpio"
+      - "997"   # GID группы gpio на Raspberry Pi OS
 
   # ─── React + Nginx ────────────────────────────────────────────────────────────
   client:

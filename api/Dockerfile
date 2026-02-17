@@ -4,7 +4,12 @@ FROM python:3.9-slim
 # Install pg_isready (postgresql-client) for the entrypoint health check
 RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
+    passwd \
     && rm -rf /var/lib/apt/lists/*
+
+# Создаём группу gpio с GID 997 (совпадает с Raspberry Pi OS),
+# чтобы group_add: "997" в docker-compose работал корректно
+RUN groupadd -g 997 gpio || true
 
 # Set the working directory
 WORKDIR /app
