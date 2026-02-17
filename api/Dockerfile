@@ -25,12 +25,14 @@ COPY ./app ./app
 COPY alembic.ini .
 COPY alembic ./alembic
 
-# Copy entrypoint script and make it executable
+# Copy entrypoint script
+# sed удаляет \r (Windows CRLF) — иначе sh падает с "not found" на каждой строке
 COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+RUN sed -i 's/\r//' entrypoint.sh && chmod +x entrypoint.sh
 
 # Expose API port
 EXPOSE 8001
 
 # Default command — runs migrations then starts uvicorn
-ENTRYPOINT ["./entrypoint.sh"]
+# ["sh", "/app/entrypoint.sh"] — гарантирует запуск даже если бит +x не сохранился
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]
