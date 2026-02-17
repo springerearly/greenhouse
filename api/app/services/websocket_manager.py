@@ -10,7 +10,7 @@ WebSocket Manager — управляет подключёнными клиент
 import json
 import asyncio
 from datetime import datetime, timezone
-from typing import Dict, Set
+from typing import Dict, Set, List, Optional
 from fastapi import WebSocket
 
 
@@ -31,7 +31,7 @@ class ConnectionManager:
             self._connections.pop(websocket, None)
         print(f"[WS] Client disconnected. Total: {len(self._connections)}")
 
-    async def subscribe(self, websocket: WebSocket, channels: list[str]):
+    async def subscribe(self, websocket: WebSocket, channels: List[str]):
         async with self._lock:
             if websocket in self._connections:
                 self._connections[websocket] = set(channels)
@@ -45,7 +45,7 @@ class ConnectionManager:
             "timestamp": datetime.now(timezone.utc).isoformat(),
         })
 
-        dead: list[WebSocket] = []
+        dead: List[WebSocket] = []
         async with self._lock:
             targets = [
                 ws for ws, channels in self._connections.items()

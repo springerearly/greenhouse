@@ -12,7 +12,7 @@ import asyncio
 import json
 import httpx
 from datetime import datetime, timezone
-from typing import Dict
+from typing import Dict, Optional
 
 from ..database import SessionLocal
 from .. import models
@@ -23,7 +23,7 @@ from .websocket_manager import manager as ws_manager
 _poll_tasks: Dict[int, asyncio.Task] = {}
 
 
-async def _fetch_device_status(device: models.Device) -> dict | None:
+async def _fetch_device_status(device: models.Device) -> Optional[dict]:
     """
     Выполняет HTTP GET http://{ip}:{port}/status
     Ожидаемый формат ответа от ESP:

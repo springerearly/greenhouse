@@ -20,7 +20,7 @@ GPIO роутер — управление пинами Raspberry Pi.
 import asyncio
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 # ─── gpiozero import с mock-заглушками ────────────────────────────────────────
 try:
@@ -71,7 +71,7 @@ devices: dict = {}
 _last_input_values: dict = {}
 
 # Ссылка на фоновую задачу watcher'а
-_watcher_task: asyncio.Task | None = None
+_watcher_task: Optional[asyncio.Task] = None
 
 router = APIRouter(prefix="/gpio", tags=["gpio"])
 
