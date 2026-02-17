@@ -545,12 +545,13 @@ def get_pi_info():
 
     # pi_info() не смогла определить плату — читаем из /proc/cpuinfo напрямую
     cpuinfo = _read_cpuinfo()
+    revision = cpuinfo.get("Revision", "unknown")
     return {
-        "revision":      cpuinfo.get("Revision", "unknown"),
+        "revision":      revision,
         "model":         cpuinfo.get("Model", "Raspberry Pi (unknown model)"),
-        "pcb_revision":  cpuinfo.get("Revision", "unknown"),
-        "ram":           "unknown",
-        "manufacturer":  "unknown",
+        "pcb_revision":  revision,
+        "ram":           _ram_from_revision(revision),
+        "manufacturer":  _manufacturer_from_revision(revision),
         "processor":     cpuinfo.get("Hardware", "unknown"),
         "headers":       {},
         "hw_pwm_pins":   sorted(HW_PWM_PINS),
@@ -567,10 +568,47 @@ def _read_cpuinfo() -> dict:
             for line in f:
                 if ":" in line:
                     key, _, val = line.partition(":")
-                    result[key.strip()] = val.strip()
+                    k = key.strip()
+                    if k not in result:   # берём первое вхождение
+                        result[k] = val.strip()
     except Exception:
         pass
     return result
+
+
+def _ram_from_revision(revision: str) -> str:
+    """
+    Декодирует объём RAM из revision-кода Raspberry Pi (новый формат с 2012).
+    Биты [22:20] кодируют память: 0=256M, 1=512M, 2=1G, 3=2G, 4=4G, 5=8G.
+    """
+    try:
+        rev_int = int(revision.lstrip("0") or "0", 16)
+        # Новый стиль revision (бит 23 = 1)
+        if rev_int & (1 << 23):
+            mem_code = (rev_int >> 20) & 0x7
+            mem_map = {0: "256 МБ", 1: "512 МБ", 2: "1 ГБ",
+                       3: "2 ГБ",   4: "4 ГБ",   5: "8 ГБ"}
+            return mem_map.get(mem_code, "unknown")
+    except Exception:
+        pass
+    return "unknown"
+
+
+def _manufacturer_from_revision(revision: str) -> str:
+    """
+    Декодирует производителя из revision-кода (биты [19:16]).
+    0=Sony UK, 1=Egoman, 2=Embest, 3=Sony Japan, 4=Embest, 5=Stadium.
+    """
+    try:
+        rev_int = int(revision.lstrip("0") or "0", 16)
+        if rev_int & (1 << 23):
+            mfr_code = (rev_int >> 16) & 0xF
+            mfr_map  = {0: "Sony UK", 1: "Egoman", 2: "Embest",
+                        3: "Sony Japan", 4: "Embest", 5: "Stadium"}
+            return mfr_map.get(mfr_code, "unknown")
+    except Exception:
+        pass
+    return "unknown"
 
 
 @router.get("/sysinfo")
@@ -648,7 +686,9 @@ def get_sysinfo():
 
     result["cpu_temp"] = cpu_temp
 
-    # ── CPU напряжение (только Pi через vcgencmd) ─────────────────────────────
+    # ── CPU напряжение (только Pi) ────────────────────────────────────────────
+    # Способ 1: vcgencmd (требует /dev/vchiq проброшенный в контейнер)
+    cpu_voltage = None
     try:
         import subprocess
         out = subprocess.check_output(
@@ -656,9 +696,29 @@ def get_sysinfo():
             timeout=2, stderr=subprocess.DEVNULL
         ).decode().strip()
         # out = "volt=1.2000V"
-        result["cpu_voltage"] = out.replace("volt=", "").replace("V", "") + " В"
+        cpu_voltage = out.replace("volt=", "").strip()
     except Exception:
-        result["cpu_voltage"] = None
+        pass
+
+    # Способ 2: sysfs hwmon (работает без /dev/vchiq на Pi OS Bullseye+)
+    if cpu_voltage is None:
+        import glob as _glob
+        for pattern in (
+            "/sys/devices/platform/soc/soc:firmware/raspberrypi-hwmon/hwmon/hwmon*/in0_input",
+            "/sys/class/hwmon/hwmon*/in0_input",
+        ):
+            for path in _glob.glob(pattern):
+                try:
+                    with open(path) as f:
+                        mv = int(f.read().strip())
+                    cpu_voltage = f"{mv / 1000:.4f}V"
+                    break
+                except Exception:
+                    pass
+            if cpu_voltage:
+                break
+
+    result["cpu_voltage"] = cpu_voltage
 
     # ── ОС / ядро ─────────────────────────────────────────────────────────────
     result["kernel"]  = platform.release()
