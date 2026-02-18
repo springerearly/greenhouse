@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { setGpioFunction } from '../services/api';
 
-// BCM-номера пинов с аппаратным PWM
+// BCM-номера пинов с аппаратным PWM (lgpio на Pi OS Bookworm)
 const HW_PWM_PINS = new Set([12, 13, 18, 19]);
 
 const FUNCTION_INFO = {
@@ -18,7 +18,8 @@ const FUNCTION_INFO = {
     PWM: {
         label:  '〜 PWM — широтно-импульсная модуляция',
         badge:  'bg-warning text-dark',
-        hint:   'ШИМ-выход, скважность 0–100%. Управляйте яркостью, скоростью мотора, мощностью нагрева.',
+        hint:   'Аппаратный ШИМ-выход, скважность 0–100%. Управляйте яркостью, скоростью мотора, мощностью нагрева.',
+        hintDisabled: 'Доступно только на GPIO 12, 13, 18 и 19 (аппаратный PWM).',
     },
 };
 
@@ -28,15 +29,24 @@ function AssignModal({ pin, show, onClose, onAssign }) {
     const [error, setError]             = useState(null);
     const [loading, setLoading]         = useState(false);
 
-    const isHwPwm = pin ? HW_PWM_PINS.has(pin.number) : false;
+    // Поддерживает ли пин аппаратный PWM (из данных бэкенда или fallback по номеру)
+    const isHwPwm = pin
+        ? (pin.supports_hw_pwm ?? HW_PWM_PINS.has(pin.number))
+        : false;
 
     useEffect(() => {
         if (pin) {
             setDescription(pin.gpio_description || '');
-            setFunc(pin.gpio_function || 'OUTPUT');
+            // Если у пина сохранён PWM но он не поддерживает аппаратный — сбрасываем на OUTPUT
+            const savedFunc = pin.gpio_function || 'OUTPUT';
+            if (savedFunc === 'PWM' && !isHwPwm) {
+                setFunc('OUTPUT');
+            } else {
+                setFunc(savedFunc);
+            }
             setError(null);
         }
-    }, [pin]);
+    }, [pin, isHwPwm]);
 
     if (!show || !pin) return null;
 
@@ -55,8 +65,6 @@ function AssignModal({ pin, show, onClose, onAssign }) {
         }
     };
 
-    const info = FUNCTION_INFO[func];
-
     return (
         <div
             className="modal d-block"
@@ -71,7 +79,7 @@ function AssignModal({ pin, show, onClose, onAssign }) {
                             Назначить GPIO {pin.number}
                             {isHwPwm && (
                                 <span className="badge bg-warning text-dark ms-2" title="Поддерживает аппаратный PWM">
-                                    HW PWM
+                                    〜 HW PWM
                                 </span>
                             )}
                         </h5>
@@ -102,49 +110,51 @@ function AssignModal({ pin, show, onClose, onAssign }) {
                             <div className="mb-3">
                                 <label className="form-label fw-semibold">Режим пина</label>
                                 <div className="d-flex flex-column gap-2">
-                                    {Object.entries(FUNCTION_INFO).map(([key, meta]) => (
-                                        <label
-                                            key={key}
-                                            className={`d-flex align-items-start gap-2 p-2 rounded border cursor-pointer ${
-                                                func === key ? 'border-success bg-light' : 'border-light'
-                                            }`}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="func"
-                                                value={key}
-                                                checked={func === key}
-                                                onChange={() => setFunc(key)}
-                                                className="mt-1"
-                                            />
-                                            <div>
-                                                <span className={`badge ${meta.badge} mb-1`}>
-                                                    {meta.label}
-                                                </span>
-                                                <div className="text-muted small">{meta.hint}</div>
-                                            </div>
-                                        </label>
-                                    ))}
+                                    {Object.entries(FUNCTION_INFO).map(([key, meta]) => {
+                                        const isPwmOption = key === 'PWM';
+                                        const disabled = isPwmOption && !isHwPwm;
+
+                                        return (
+                                            <label
+                                                key={key}
+                                                className={`d-flex align-items-start gap-2 p-2 rounded border ${
+                                                    disabled
+                                                        ? 'border-light bg-light opacity-50'
+                                                        : func === key
+                                                            ? 'border-success bg-light'
+                                                            : 'border-light'
+                                                }`}
+                                                style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+                                                title={disabled ? 'Аппаратный PWM доступен только на GPIO 12, 13, 18, 19' : undefined}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="func"
+                                                    value={key}
+                                                    checked={func === key}
+                                                    onChange={() => !disabled && setFunc(key)}
+                                                    disabled={disabled}
+                                                    className="mt-1"
+                                                />
+                                                <div>
+                                                    <span className={`badge ${meta.badge} mb-1`}>
+                                                        {meta.label}
+                                                    </span>
+                                                    <div className="text-muted small">
+                                                        {disabled ? meta.hintDisabled : meta.hint}
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
                             {/* Подсказка по аппаратному PWM */}
-                            {func === 'PWM' && (
-                                <div className={`alert py-2 small ${isHwPwm ? 'alert-success' : 'alert-warning'}`}>
-                                    {isHwPwm ? (
-                                        <>
-                                            <strong>✅ Аппаратный PWM</strong> — GPIO {pin.number} поддерживает
-                                            аппаратный ШИМ (минимальный джиттер). Для активации установите
-                                            <code> pigpio</code> и раскомментируйте pin_factory в gpio.py.
-                                        </>
-                                    ) : (
-                                        <>
-                                            <strong>⚠️ Программный PWM</strong> — GPIO {pin.number} не поддерживает
-                                            аппаратный ШИМ. Будет использован программный PWM через gpiozero
-                                            (возможен джиттер). Для аппаратного PWM используйте GPIO 12, 13, 18 или 19.
-                                        </>
-                                    )}
+                            {func === 'PWM' && isHwPwm && (
+                                <div className="alert alert-success py-2 small">
+                                    <strong>✅ Аппаратный PWM</strong> — GPIO {pin.number} поддерживает
+                                    аппаратный ШИМ с минимальным джиттером (lgpio, Pi OS Bookworm).
                                 </div>
                             )}
                         </form>

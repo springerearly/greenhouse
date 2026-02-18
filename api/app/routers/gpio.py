@@ -319,6 +319,17 @@ async def set_function(gpio_config: schemas.GpioCreate, db: Session = Depends(ge
             detail="INPUT недоступен вне Raspberry Pi."
         )
 
+    # PWM доступен только на пинах с аппаратной поддержкой (GPIO 12, 13, 18, 19).
+    # lgpio (дефолтный factory на Pi OS Bookworm) не поддерживает программный PWM.
+    if function == "PWM" and not _is_hw_pwm(pin_number):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"GPIO {pin_number} не поддерживает аппаратный PWM. "
+                f"Используйте GPIO 12, 13, 18 или 19 (аппаратные PWM пины)."
+            )
+        )
+
     # Освобождаем старый объект пина
     _close_pin(pin_number)
 
@@ -330,14 +341,10 @@ async def set_function(gpio_config: schemas.GpioCreate, db: Session = Depends(ge
             _make_input_callbacks(pin_number, dev)
             _last_input_values[pin_number] = int(dev.value)
         else:  # PWM
-            if ON_PI and _is_hw_pwm(pin_number):
-                # Аппаратный PWM — требует pigpio pin factory
-                # (раскомментировать если установлен pigpio)
-                # from gpiozero.pins.pigpio import PiGPIOFactory
-                # dev = PWMOutputDevice(pin_number, pin_factory=PiGPIOFactory())
-                dev = PWMOutputDevice(pin_number, initial_value=0.0)
-            else:
-                dev = PWMOutputDevice(pin_number, initial_value=0.0)
+            # Программный ШИМ через RPi.GPIO (GPIOZERO_PIN_FACTORY=rpigpio).
+            # Работает на всех пинах. HW PWM на GPIO 12/13/18/19 —
+            # автоматически используется RPi.GPIO если пин его поддерживает.
+            dev = PWMOutputDevice(pin_number, initial_value=0.0)
     except GPIOZeroError as e:
         err = str(e)
         # Даём понятную подсказку при отсутствии доступа к /dev/gpiomem
