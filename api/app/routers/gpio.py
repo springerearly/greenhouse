@@ -341,20 +341,20 @@ async def set_function(gpio_config: schemas.GpioCreate, db: Session = Depends(ge
             _make_input_callbacks(pin_number, dev)
             _last_input_values[pin_number] = int(dev.value)
         else:  # PWM
-            # Программный ШИМ через RPi.GPIO (GPIOZERO_PIN_FACTORY=rpigpio).
-            # Работает на всех пинах. HW PWM на GPIO 12/13/18/19 —
-            # автоматически используется RPi.GPIO если пин его поддерживает.
+            # Аппаратный PWM через lgpio (дефолтный factory на Pi OS Bookworm).
+            # Поддерживается только на GPIO 12, 13, 18, 19.
+            # Требует /dev/gpiochip0 в docker-compose devices.
             dev = PWMOutputDevice(pin_number, initial_value=0.0)
     except GPIOZeroError as e:
         err = str(e)
-        # Даём понятную подсказку при отсутствии доступа к /dev/gpiomem
-        if "gpiomem" in err or "permission" in err.lower() or "No access" in err:
+        # Даём понятную подсказку при отсутствии доступа к GPIO
+        if "gpiomem" in err or "permission" in err.lower() or "No access" in err or "gpiochip" in err:
             raise HTTPException(
                 status_code=500,
                 detail=(
                     f"Нет доступа к GPIO: {e}. "
-                    "Убедитесь, что в docker-compose.yml раскомментированы "
-                    "devices: /dev/gpiomem и /dev/gpiochip0, и group_add: gpio."
+                    "Убедитесь, что в docker-compose.yml в секции devices указаны "
+                    "/dev/gpiomem и /dev/gpiochip0, и group_add содержит GID группы gpio (обычно 997)."
                 )
             )
         raise HTTPException(status_code=500, detail=f"GPIO error: {e}")

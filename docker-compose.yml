@@ -41,10 +41,9 @@ services:
       - DB_USER=user
     # Доступ к GPIO и VideoCore на Raspberry Pi
     devices:
-      - /dev/gpiomem      # GPIO доступ (RPi.GPIO / gpiozero rpigpio factory)
+      - /dev/gpiomem      # GPIO доступ (gpiozero / DigitalOutputDevice)
+      - /dev/gpiochip0    # lgpio factory — требуется для PWMOutputDevice (аппаратный PWM)
       - /dev/vchiq        # VideoCore — нужен для vcgencmd (напряжение, частоты)
-      # /dev/gpiochip0 намеренно убран — он активирует lgpio backend,
-      # который не поддерживает программный PWM ни на каких пинах
     group_add:
       - "997"   # GID группы gpio на Raspberry Pi OS
 
