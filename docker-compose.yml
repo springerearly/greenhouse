@@ -39,10 +39,14 @@ services:
       - DATABASE_URL=postgresql://user:password@db/greenhousedb
       - DB_HOST=db
       - DB_USER=user
+    # pigpiod требует SYS_RAWIO и /dev/mem для DMA (аппаратный PWM)
+    cap_add:
+      - SYS_RAWIO
     # Доступ к GPIO и VideoCore на Raspberry Pi
     devices:
-      - /dev/gpiomem      # GPIO доступ (gpiozero / DigitalOutputDevice)
-      - /dev/gpiochip0    # lgpio factory — требуется для PWMOutputDevice (аппаратный PWM)
+      - /dev/gpiomem      # GPIO доступ (gpiozero)
+      - /dev/gpiochip0    # gpiochip interface
+      - /dev/mem          # pigpiod: DMA для аппаратного PWM
       - /dev/vchiq        # VideoCore — нужен для vcgencmd (напряжение, частоты)
     group_add:
       - "997"   # GID группы gpio на Raspberry Pi OS
