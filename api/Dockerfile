@@ -1,11 +1,19 @@
 # Use Python 3.9 slim as base
 FROM python:3.9-slim
 
-# Install pg_isready (postgresql-client) for the entrypoint health check
+# Install system dependencies + build pigpio from source
+# (пакет pigpio удалён из Debian Trixie, поэтому собираем joan2937/pigpio v79)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     passwd \
-    pigpio \
+    wget \
+    make \
+    gcc \
+    && wget -qO /tmp/pigpio.tar https://github.com/joan2937/pigpio/archive/refs/tags/v79.tar.gz \
+    && tar -xf /tmp/pigpio.tar -C /tmp \
+    && make -C /tmp/pigpio-79 -j$(nproc) \
+    && make -C /tmp/pigpio-79 install \
+    && rm -rf /tmp/pigpio.tar /tmp/pigpio-79 \
     && rm -rf /var/lib/apt/lists/*
 
 # Создаём группу gpio с GID 997 (совпадает с Raspberry Pi OS),
