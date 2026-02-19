@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     make \
     gcc \
+    libc6-dev \
     && wget -qO /tmp/pigpio.tar https://github.com/joan2937/pigpio/archive/refs/tags/v79.tar.gz \
     && tar -xf /tmp/pigpio.tar -C /tmp \
     && make -C /tmp/pigpio-79 -j$(nproc) \
