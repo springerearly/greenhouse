@@ -28,6 +28,18 @@ alembic upgrade head
 echo "✅ Migrations applied"
 
 echo "🚀 Starting Uvicorn..."
-# gpiozero использует lgpio по умолчанию на Pi OS Bookworm.
-# lgpio поддерживает аппаратный PWM только на GPIO 12, 13, 18, 19 — это и есть желаемое поведение.
+
+# ── pigpiod (нужен gpiozero для аппаратного PWM) ─────────────────────────────
+# Запускаем только если /dev/gpiomem доступен (т.е. мы на Raspberry Pi)
+if [ -e /dev/gpiomem ]; then
+    if command -v pigpiod > /dev/null 2>&1; then
+        echo "🔧 Starting pigpiod..."
+        pigpiod -l 2>/dev/null || true   # -l: без авторизации по localhost
+        sleep 0.5
+        echo "✅ pigpiod started"
+    else
+        echo "⚠️  pigpiod not found — hardware PWM unavailable"
+    fi
+fi
+
 exec uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload

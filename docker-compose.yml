@@ -47,6 +47,7 @@ services:
       - /dev/gpiomem      # GPIO доступ (gpiozero)
       - /dev/gpiochip0    # gpiochip interface
       - /dev/mem          # pigpiod: DMA для аппаратного PWM
+      - /dev/vcio         # pigpiod: mailbox для DMA на Pi 4
       - /dev/vchiq        # VideoCore — нужен для vcgencmd (напряжение, частоты)
     group_add:
       - "997"   # GID группы gpio на Raspberry Pi OS

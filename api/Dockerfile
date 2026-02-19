@@ -5,6 +5,7 @@ FROM python:3.9-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     passwd \
+    pigpio \
     && rm -rf /var/lib/apt/lists/*
 
 # Создаём группу gpio с GID 997 (совпадает с Raspberry Pi OS),
