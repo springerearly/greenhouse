@@ -39,6 +39,7 @@ services:
       - DATABASE_URL=postgresql://user:password@db/greenhousedb
       - DB_HOST=db
       - DB_USER=user
+      - GPIOZERO_PIN_FACTORY=pigpio  # не перебирать бэкенды — сразу использовать pigpiod
     # pigpiod требует SYS_RAWIO и /dev/mem для DMA (аппаратный PWM)
     cap_add:
       - SYS_RAWIO
